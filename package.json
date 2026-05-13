@@ -1,0 +1,5 @@
+{
+  "name": "election-wrapped-repo",
+  "private": true,
+  "description": "Root shim so Vercel runs install/build inside election_wrapped/"
+}

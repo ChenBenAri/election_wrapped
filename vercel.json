@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "npm install --prefix ./election_wrapped",
+  "buildCommand": "npm run build --prefix ./election_wrapped",
+  "outputDirectory": "election_wrapped/dist"
+}
