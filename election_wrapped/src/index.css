@@ -11,6 +11,7 @@ body {
   direction: rtl;
   font-family: "Heebo", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  background-color: #f0f2f5;
 }
 
 /* Subtle film grain for “wrapped” polish */

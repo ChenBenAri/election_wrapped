@@ -1,303 +1,639 @@
-import { useId } from "react";
-import { resolveDisplayName } from "../data/options";
+import { useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-function NeonBlob({ className }) {
+const STORY_SEGMENTS = 4;
+const STORY_FILLED = 2;
+
+/** ארבעת רקעי אופציה ב׳ (קבצים ב־public) */
+const OPTION_B_BACKGROUNDS = [
+  { id: "b-periwinkle", src: "/option-b-bg-1.png" },
+  { id: "b-mustard", src: "/option-b-bg-2.png" },
+  { id: "b-lime", src: "/option-b-bg-3.png" },
+  { id: "b-red", src: "/option-b-bg-4.png" },
+];
+
+const WRAPPED_TOPIC_TITLE = "3 הנושאים שחשובים לך בבחירות הקרובות:";
+
+const WRAPPED_TOPIC_LINES = [
+  "שוק חופשי ומינימום התערבות ממשלתית",
+  "שאיפה להסדר מדיני ארוך טווח",
+  "איכות מערכת החינוך",
+];
+
+/** טקסט אופציה א׳ — סקירת ערכים (רפרנס כהה־ניאון) */
+const VALUES_NEON_HEADLINE = "3 הנושאים שחשובים לך בבחירות הקרובות:";
+const VALUES_NEON_LINES = [
+  "שוק חופשי ומינימום התערבות ממשלתית",
+  "שאיפה להסדר מדיני ארוך טווח",
+  "איכות מערכת החינוך",
+];
+
+/** טקסט אופציה ג׳ — נושאי בחירות (נפרד מא׳) */
+const VALUES_WRAPPED_HEADLINE = "3 הנושאים שחשובים לך בבחירות הקרובות:";
+const VALUES_WRAPPED_LINES = [
+  "שוק חופשי ומינימום התערבות ממשלתית",
+  "שאיפה להסדר מדיני ארוך טווח",
+  "איכות מערכת החינוך",
+];
+
+const VALUES_SLIDE_COUNT = 4;
+const MAP_SLIDE_COUNT = 4;
+
+/** סרגל עליון (אופציה א׳) — 5 מקטעים: 3 אפורים, 2 בגרדיאנט ירוק→ורוד */
+function ValuesWrappedTopBar({ compact, index, total }) {
+  const h = compact ? "h-[3px] sm:h-1" : "h-1 sm:h-[5px]";
+  const gap = compact ? "gap-1" : "gap-1.5";
+  const useStoryStyle = total === 5;
+
   return (
-    <div
-      className={`pointer-events-none absolute rounded-full blur-3xl opacity-70 ${className}`}
-      aria-hidden
-    />
-  );
-}
-
-function Sparkle({ className }) {
-  return (
-    <span
-      className={`pointer-events-none absolute h-1.5 w-1.5 rounded-full bg-[#94fbab] shadow-[0_0_12px_#94fbab] ${className}`}
-      aria-hidden
-    />
-  );
-}
-
-/** כרטיס אופציה א׳ — אסתטיקת ניאון/Wrapped בהשראת סקר ערכים */
-function ValuesCreative({ name, compact }) {
-  const display = resolveDisplayName(name);
-  const title = compact ? "text-lg sm:text-xl" : "text-xl sm:text-2xl";
-  const sub = compact ? "text-base sm:text-lg" : "text-lg sm:text-xl";
-  const list = compact ? "text-sm sm:text-base" : "text-base sm:text-lg";
-  const num = compact ? "text-2xl sm:text-3xl" : "text-3xl sm:text-4xl";
-
-  return (
-    <div
-      className="relative flex h-full min-h-0 flex-col overflow-hidden rounded-[1.35rem] bg-[#0c0518] p-4 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.06)] sm:p-5"
-      dir="rtl"
-    >
-      <div className="grain-overlay absolute inset-0" aria-hidden />
-      <NeonBlob className="-left-10 -top-24 h-48 w-48 bg-gradient-to-br from-[#94fbab] to-[#ff2bd6]" />
-      <NeonBlob className="-bottom-28 -right-16 h-56 w-56 bg-gradient-to-tl from-[#ff2bd6] to-[#94fbab]" />
-      <div
-        className="pointer-events-none absolute -right-8 top-1/3 h-40 w-40 rotate-12 rounded-[3rem] border-[10px] border-transparent bg-gradient-to-l from-[#94fbab]/40 to-[#ff2bd6]/25 opacity-80"
-        style={{ maskImage: "radial-gradient(circle at 30% 30%, black 55%, transparent 70%)" }}
-        aria-hidden
-      />
-      <Sparkle className="left-[12%] top-[18%]" />
-      <Sparkle className="right-[18%] top-[26%] h-2 w-2 bg-[#ff2bd6] shadow-[0_0_12px_#ff2bd6]" />
-      <Sparkle className="bottom-[22%] left-[20%]" />
-
-      <div className="relative z-10 flex justify-center gap-1 px-1 pt-1">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <span
-            key={i}
-            className={`h-1 flex-1 rounded-full ${i < 2 ? "bg-gradient-to-l from-[#94fbab] to-[#ff2bd6]" : "bg-white/15"}`}
-          />
-        ))}
-      </div>
-
-      <div className="relative z-10 mt-4 flex flex-1 flex-col items-center text-center">
-        <h3 className={`max-w-[95%] font-black leading-tight ${title}`}>
-          סקירת שנת הערכים של {display}
-        </h3>
-        <p
-          className={`mt-3 bg-gradient-to-l from-[#94fbab] to-[#6cfbc7] bg-clip-text font-black text-transparent drop-shadow-[0_0_18px_rgba(148,251,171,0.35)] ${sub}`}
-        >
-          ערכים מובילים
-        </p>
-
-        <ul className={`mt-5 w-full max-w-[100%] space-y-3 text-right ${list}`}>
-          {[
-            "שוק חופשי ומינימום התערבות",
-            "תחבורה ציבורית בשבת",
-            "מנהיגות כריזמטית",
-          ].map((line, idx) => (
-            <li
-              key={line}
-              className="flex items-start gap-3 rounded-2xl bg-black/25 px-3 py-2.5 ring-1 ring-white/10 backdrop-blur-sm"
-            >
+    <div className="relative z-20 flex shrink-0 items-center justify-between gap-2.5 px-0.5 pt-1" dir="ltr">
+      <div className={`flex min-w-0 flex-1 justify-center ${gap}`} aria-hidden>
+        {useStoryStyle ? (
+          <>
+            {[0, 1, 2].map((i) => (
               <span
-                className={`shrink-0 bg-gradient-to-br from-[#94fbab] to-[#ff2bd6] bg-clip-text font-black leading-none text-transparent drop-shadow-[0_0_12px_rgba(255,43,214,0.35)] [text-shadow:0_0_1px_rgba(255,255,255,0.15)] ${num}`}
-              >
-                {idx + 1}
-              </span>
-              <span className="font-bold leading-snug">{line}</span>
-            </li>
-          ))}
-        </ul>
+                key={i}
+                className={`${h} flex-1 rounded-full bg-zinc-800/95 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] ring-1 ring-black/40`}
+              />
+            ))}
+            {[3, 4].map((i) => (
+              <span
+                key={i}
+                className={`${h} flex-1 rounded-full bg-gradient-to-r from-[#00ff99] to-[#ff00ff] shadow-[0_0_14px_rgba(0,255,153,0.35),0_0_18px_rgba(255,0,255,0.25)]`}
+              />
+            ))}
+          </>
+        ) : (
+          Array.from({ length: total }).map((_, i) => (
+            <span
+              key={i}
+              className={
+                i <= index
+                  ? `${h} flex-1 rounded-full bg-gradient-to-r from-[#00ff99] to-[#ff00ff] shadow-[0_0_14px_rgba(0,255,153,0.35),0_0_18px_rgba(255,0,255,0.25)]`
+                  : `${h} flex-1 rounded-full bg-zinc-800/95 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] ring-1 ring-black/40`
+              }
+            />
+          ))
+        )}
       </div>
-
-      <div
-        className="pointer-events-none absolute bottom-4 left-4 h-10 w-10 rotate-12 rounded-md bg-gradient-to-br from-[#94fbab] to-[#ff2bd6] opacity-90 shadow-[0_12px_40px_rgba(255,43,214,0.35)]"
+      <span
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/50 text-[15px] font-light leading-none text-white/75 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm"
         aria-hidden
-      />
+      >
+        ✕
+      </span>
     </div>
   );
 }
 
-function BallotIcon({ className }) {
-  const gid = useId().replace(/:/g, "");
-  const grad = `bb-${gid}`;
+/** טקסט נושאים בסגנון Spotify Wrapped — לאופציה ב׳ */
+function WrappedSpotifyTopicArticle({ compact }) {
+  const articleClass = compact
+    ? "relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0a0a0a]/88 px-3 py-5 shadow-[0_12px_36px_rgba(0,0,0,0.5)] backdrop-blur-[2px] sm:px-4 sm:py-6"
+    : "relative overflow-hidden rounded-[1.35rem] border border-white/[0.09] bg-[#0a0a0a]/85 px-4 py-6 shadow-[0_16px_44px_rgba(0,0,0,0.48)] backdrop-blur-[2px] sm:px-5 sm:py-8";
+
+  const stripClass =
+    "pointer-events-none absolute bottom-10 right-1 top-14 w-[3px] rounded-full bg-gradient-to-b from-white/20 via-indigo-200/35 to-white/10 sm:right-2";
+
+  const numClass = compact
+    ? "shrink-0 text-3xl font-black tabular-nums leading-none tracking-[-0.06em] text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] sm:text-[2rem]"
+    : "shrink-0 text-4xl font-black tabular-nums leading-none tracking-[-0.06em] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] sm:text-[2.35rem]";
+
   return (
-    <svg
-      className={className}
-      viewBox="0 0 64 64"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+    <div className="pointer-events-none w-full max-w-[min(100%,26rem)] select-none sm:max-w-[28rem]">
+      <article className={articleClass}>
+        <div className={stripClass} aria-hidden />
+
+        <p className="relative z-[1] flex justify-center pe-2 ps-3 sm:pe-3 sm:ps-4">
+          <span
+            className={
+              compact
+                ? "inline-block max-w-full rounded-[1px] bg-[#ececec] px-2 py-[0.35rem] text-center text-sm font-black leading-[1.12] tracking-[-0.055em] text-neutral-950 sm:px-2.5 sm:py-1.5 sm:text-base"
+                : "inline-block max-w-full rounded-[2px] bg-[#ebebeb] px-2.5 py-1.5 text-center text-base font-black leading-[1.08] tracking-[-0.055em] text-neutral-950 sm:px-3 sm:py-2 sm:text-lg"
+            }
+          >
+            {WRAPPED_TOPIC_TITLE}
+          </span>
+        </p>
+
+        <ul
+          dir="rtl"
+          className={
+            compact
+              ? "relative z-[1] mt-4 list-none space-y-3.5 ps-3 pe-2 sm:mt-5 sm:space-y-4 sm:ps-4 sm:pe-3"
+              : "relative z-[1] mt-5 list-none space-y-4 ps-4 pe-3 sm:mt-6 sm:space-y-5 sm:ps-5 sm:pe-4"
+          }
+        >
+          {WRAPPED_TOPIC_LINES.map((line, i) => (
+            <li key={line} className="flex w-full justify-start">
+              <div className="flex max-w-full items-baseline gap-2.5 sm:gap-3">
+                <span className={numClass}>{i + 1}</span>
+                <span
+                  className={
+                    compact
+                      ? "max-w-[min(100%,16.5rem)] rounded-[1px] bg-[#ececec] px-1.5 py-[0.2rem] text-right text-xs font-black leading-snug tracking-[-0.05em] text-neutral-950 sm:max-w-[18.5rem] sm:px-2 sm:py-1 sm:text-sm sm:leading-normal"
+                      : "max-w-[min(100%,19.5rem)] rounded-[2px] bg-[#ebebeb] px-2 py-1 text-right text-sm font-black leading-snug tracking-[-0.05em] text-neutral-950 sm:max-w-[21rem] sm:px-2.5 sm:py-1.5 sm:text-base sm:leading-normal"
+                  }
+                >
+                  {line}
+                </span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </article>
+    </div>
+  );
+}
+
+/** סרגל ארבעת הברים — מילוי לבן על מסלול עדין (מעל פאנל כהה קבוע) */
+function WrappedProgress({ index, total, compact }) {
+  return (
+    <div
+      className={`relative z-20 flex shrink-0 ${compact ? "gap-1" : "gap-2"}`}
+      dir="ltr"
       aria-hidden
     >
-      <defs>
-        <linearGradient id={grad} x1="12" y1="8" x2="52" y2="56" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#38bdf8" />
-          <stop offset="1" stopColor="#1d4ed8" />
-        </linearGradient>
-      </defs>
-      <rect x="14" y="18" width="36" height="38" rx="4" fill={`url(#${grad})`} />
-      <rect x="18" y="10" width="28" height="12" rx="3" fill="#e0f2fe" />
-      <path d="M22 26h20v22H22z" fill="#fff" />
-      <path
-        d="M28 38l4 4 8-10"
-        stroke="#1d4ed8"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      {Array.from({ length: total }).map((_, i) => (
+        <div
+          key={i}
+          className={`flex-1 overflow-hidden rounded-full bg-white/18 ${compact ? "h-0.5" : "h-1"}`}
+        >
+          <motion.div
+            className="h-full rounded-full bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.08)]"
+            initial={false}
+            animate={{
+              width: i <= index ? "100%" : "0%",
+            }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** ניצוץ קטן (כוכב) בסגנון Year in Review */
+function DuoSparkle({ className }) {
+  return (
+    <svg className={`pointer-events-none text-white/90 ${className}`} viewBox="0 0 14 14" fill="currentColor" aria-hidden>
+      <path d="M7 0l1.1 4.9L14 7l-5.9 2.1L7 14l-1.1-4.9L0 7l5.9-2.1L7 0z" />
     </svg>
   );
 }
 
-/** כרטיס אופציה ב׳ — שפה רשמית/בחירות בהשראת התאמה לפרופיל */
-function ProfileCreative({ name, compact }) {
-  const display = resolveDisplayName(name);
-  const h1 = compact ? "text-sm sm:text-base" : "text-base sm:text-lg";
-  const h2w = compact ? "text-xl sm:text-2xl" : "text-2xl sm:text-3xl";
-  const h2b = compact ? "text-lg sm:text-xl" : "text-xl sm:text-2xl";
-  const card = compact ? "text-sm sm:text-base" : "text-base sm:text-lg";
+/** סרגל “סטורי” — מספר חלונות + מיקום נוכחי (מקטעים + ✕), בסגנון לפי theme */
+function StoryProgressBar({ theme, compact, index, total }) {
+  const segmentCount = total ?? STORY_SEGMENTS;
+  const isFilled = (i) => (index != null && total != null ? i <= index : i < STORY_FILLED);
+  const stretchW = compact ? "min-w-[1.5rem] flex-1 sm:min-w-[1.75rem]" : "w-8 sm:w-10";
+
+  const segmentClass = (filled) => {
+    if (theme === "neon") {
+      const w = "w-8 sm:w-10";
+      return filled
+        ? `h-1 rounded-full bg-gradient-to-l from-[#94fbab] to-[#ff2bd6] shadow-[0_0_14px_rgba(148,251,171,0.45)] ${w}`
+        : `h-1 rounded-full border border-dashed border-white/25 bg-white/5 ${w}`;
+    }
+    if (theme === "duo") {
+      return filled
+        ? `h-1.5 rounded-full bg-[#49AEF9] shadow-[0_1px_6px_rgba(73,174,249,0.55)] ${stretchW}`
+        : `h-1.5 rounded-full border border-dashed border-sky-300/75 bg-white/65 ${stretchW}`;
+    }
+    return filled
+      ? `h-1.5 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.35)] ${stretchW}`
+      : `h-1.5 rounded-full border border-dashed border-white/40 bg-white/15 ${stretchW}`;
+  };
+
+  const closeClass =
+    theme === "neon"
+      ? "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/30 text-sm font-light text-white/80 shadow-inner"
+      : theme === "duo"
+        ? "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-sky-200/90 bg-white/85 text-sm font-light text-sky-800 shadow-sm backdrop-blur-sm"
+        : "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/35 bg-black/45 text-sm font-light text-white shadow-md backdrop-blur-md";
+
+  return (
+    <div className="relative z-10 flex items-center justify-between gap-2 px-0.5 pt-0.5">
+      <div className="flex min-w-0 flex-1 justify-center gap-1.5">
+        {Array.from({ length: segmentCount }).map((_, i) => (
+          <span key={i} className={segmentClass(isFilled(i))} aria-hidden />
+        ))}
+      </div>
+      <span className={closeClass} aria-hidden>
+        ✕
+      </span>
+    </div>
+  );
+}
+
+function NeonBlob({ className }) {
+  return (
+    <div
+      className={`pointer-events-none absolute rounded-full blur-3xl opacity-75 ${className}`}
+      aria-hidden
+    />
+  );
+}
+
+/** נקודות זוהרות ירוק / ורוד (אופציה א׳) */
+function ValuesNeonDot({ className, tone, soft = false }) {
+  const size = soft ? "h-2 w-2 sm:h-2.5 sm:w-2.5" : "h-1.5 w-1.5";
+
+  const glow =
+    tone === "green"
+      ? soft
+        ? "bg-[radial-gradient(circle_at_35%_30%,rgba(167,243,208,0.75)_0%,rgba(52,211,153,0.5)_45%,rgba(20,83,45,0.35)_100%)] shadow-[0_0_6px_2px_rgba(110,231,183,0.2),0_0_14px_4px_rgba(16,185,129,0.08)] ring-1 ring-emerald-200/15"
+        : "bg-[#39ff14] shadow-[0_0_10px_3px_rgba(57,255,20,0.55),0_0_22px_6px_rgba(57,255,20,0.15)]"
+      : "bg-[#ff2bd6] shadow-[0_0_10px_3px_rgba(255,43,214,0.5),0_0_22px_6px_rgba(255,0,255,0.12)]";
+
+  return <div className={`pointer-events-none absolute rounded-full ${size} ${glow} ${className}`} aria-hidden />;
+}
+
+/** מחלקות לשקופית אופציה א׳ — רפרנס כהה־ניאון */
+function getValuesNeonSlideStyles(compact) {
+  return {
+    numClass: compact
+      ? "shrink-0 bg-gradient-to-b from-pink-300 to-white bg-clip-text text-[1.65rem] font-black tabular-nums leading-none text-transparent sm:text-[2rem]"
+      : "shrink-0 bg-gradient-to-b from-pink-300 to-white bg-clip-text text-[2rem] font-black tabular-nums leading-none text-transparent sm:text-[2.4rem]",
+    pillClass: compact
+      ? "flex w-full items-center gap-3 rounded-full border border-white/12 bg-black/50 px-3.5 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-md sm:px-4 sm:py-3"
+      : "flex w-full items-center gap-3.5 rounded-full border border-white/14 bg-black/45 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] backdrop-blur-md sm:px-5 sm:py-3.5",
+  };
+}
+
+/** תוכן שקופית אופציה א׳ — סקירת ערכים (רפרנס) */
+function ValuesNeonSlidePanel({ compact, numClass, pillClass }) {
+  return (
+    <div className="pointer-events-none flex w-full flex-col items-center justify-center gap-1.5 px-2 sm:gap-2">
+      <h2
+        className={
+          compact
+            ? "max-w-[19.5rem] text-balance text-center text-[0.95rem] font-black leading-[1.22] tracking-[-0.018em] text-white sm:text-[1.05rem]"
+            : "max-w-[21rem] text-balance text-center text-[1.05rem] font-black leading-[1.2] tracking-[-0.018em] text-white sm:text-[1.2rem]"
+        }
+      >
+        {VALUES_NEON_HEADLINE}
+      </h2>
+
+      <ul className="mt-2 w-full max-w-[18.5rem] space-y-2 sm:mt-2.5 sm:max-w-[20.5rem] sm:space-y-2.5">
+        {VALUES_NEON_LINES.map((line, idx) => (
+          <li key={line} className="flex justify-center">
+            <div className={pillClass}>
+              <span className={numClass}>{idx + 1}</span>
+              <p className="min-w-0 flex-1 text-right text-[0.8125rem] font-bold leading-snug tracking-[-0.01em] text-white sm:text-[0.9375rem]">
+                {line}
+              </p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** מחלקות לכותרת + רשימת נושאים (אופציות א׳ ו־ג׳) */
+function getWrappedTopicSlideStyles(compact) {
+  return {
+    numClass: compact
+      ? "shrink-0 bg-gradient-to-b from-blue-700 via-blue-600 to-slate-400 bg-clip-text text-[1.65rem] font-black tabular-nums leading-none text-transparent sm:text-[2rem]"
+      : "shrink-0 bg-gradient-to-b from-blue-800 via-blue-600 to-sky-400 bg-clip-text text-[2rem] font-black tabular-nums leading-none text-transparent sm:text-[2.4rem]",
+    pillClass: compact
+      ? "flex w-full items-center gap-3 rounded-full border border-slate-200/70 bg-white/45 px-3.5 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] backdrop-blur-md sm:px-4 sm:py-3"
+      : "flex w-full items-center gap-3.5 rounded-full border border-slate-200/80 bg-white/50 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-md sm:px-5 sm:py-3.5",
+  };
+}
+
+/** תוכן שקופית בודדת — כותרת, תת־כותרת ורשימה (אופציות א׳ ו־ג׳) */
+function ValuesSlidePanel({ compact, numClass, pillClass }) {
+  return (
+    <div className="flex w-full flex-col items-center justify-center gap-1.5 px-2 sm:gap-2">
+      <h2
+        className={
+          compact
+            ? "max-w-[19.5rem] text-balance text-center text-[0.95rem] font-black leading-[1.22] tracking-[-0.018em] text-slate-900 sm:text-[1.05rem]"
+            : "max-w-[21rem] text-balance text-center text-[1.05rem] font-black leading-[1.2] tracking-[-0.018em] text-slate-900 sm:text-[1.2rem]"
+        }
+      >
+        {VALUES_WRAPPED_HEADLINE}
+      </h2>
+
+      <ul className="mt-2 w-full max-w-[18.5rem] space-y-2 sm:mt-2.5 sm:max-w-[20.5rem] sm:space-y-2.5">
+        {VALUES_WRAPPED_LINES.map((line, idx) => (
+          <li key={line} className="flex justify-center">
+            <div className={pillClass}>
+              <span className={numClass}>{idx + 1}</span>
+              <p className="min-w-0 flex-1 text-right text-[0.8125rem] font-bold leading-snug tracking-[-0.01em] text-slate-900 sm:text-[0.9375rem]">
+                {line}
+              </p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** כרטיס א׳ — רפרנס כהה־ניאון + דפדוף 1–4 */
+function ValuesCreative({ compact }) {
+  const total = VALUES_SLIDE_COUNT;
+  const [index, setIndex] = useState(0);
+  const touchStartX = useRef(null);
+  const grainOpacity = compact ? 0.52 : 0.58;
+
+  const goPrev = () => setIndex((i) => Math.max(0, i - 1));
+  const goNext = () => setIndex((i) => Math.min(total - 1, i + 1));
+
+  const onTouchStart = (e) => {
+    touchStartX.current = e.changedTouches[0]?.clientX ?? null;
+  };
+  const onTouchEnd = (e) => {
+    const start = touchStartX.current;
+    touchStartX.current = null;
+    if (start == null) return;
+    const end = e.changedTouches[0]?.clientX ?? start;
+    const dx = end - start;
+    if (dx < -48) goNext();
+    else if (dx > 48) goPrev();
+  };
+
+  const { numClass, pillClass } = getValuesNeonSlideStyles(compact);
+
+  const navBtn =
+    "grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/20 bg-black/40 text-white shadow-md backdrop-blur-md transition hover:bg-black/50 disabled:cursor-not-allowed disabled:opacity-35 sm:h-10 sm:w-10";
 
   return (
     <div
-      className="relative flex h-full min-h-0 flex-col overflow-hidden rounded-[1.35rem] bg-gradient-to-b from-[#042c7a] via-[#063a9e] to-[#02143d] p-4 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.08)] sm:p-5"
+      className="relative flex h-full min-h-0 flex-col overflow-hidden rounded-[1.35rem] bg-[#0a0318] p-3 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.07)] sm:p-4"
       dir="rtl"
+      aria-label={`קריאייטיב א׳ — שקופית ${index + 1} מתוך ${total}`}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
     >
-      <div className="pointer-events-none absolute -left-16 top-10 h-40 w-40 rounded-full bg-sky-400/15 blur-3xl" aria-hidden />
-      <div className="pointer-events-none absolute -right-10 bottom-0 h-44 w-44 rounded-full bg-blue-300/10 blur-3xl" aria-hidden />
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_0%,#1f0a2e_0%,#0d0514_42%,#020005_100%)]"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#2a1038]/55 via-transparent to-black/80"
+        aria-hidden
+      />
+      <div className="grain-overlay absolute inset-0" style={{ opacity: grainOpacity }} aria-hidden />
 
-      <header className="relative z-10 flex items-start justify-between gap-2">
-        <BallotIcon className="h-12 w-12 shrink-0 drop-shadow-lg sm:h-14 sm:w-14" />
-        <div className="flex-1 text-center">
-          <p className={`font-black tracking-tight ${h1}`}>בחירות 2026 WRAPPED</p>
-        </div>
-        <div
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-br-2xl bg-white shadow-md ring-2 ring-blue-700 sm:h-14 sm:w-14"
-          aria-hidden
+      <div
+        className="pointer-events-none absolute -right-[18%] top-[18%] h-[min(78%,26rem)] w-[min(72%,14rem)] rounded-full bg-gradient-to-bl from-[#00ff99]/25 via-[#7c3aed]/22 to-[#ff00ff]/12 blur-3xl"
+        aria-hidden
+      />
+      <NeonBlob className="-left-24 top-0 h-48 w-48 bg-[#6d28d9]/25 blur-[48px]" />
+
+      <ValuesNeonDot className="left-[12%] top-[13%]" tone="green" soft />
+      <ValuesNeonDot className="right-[8%] top-[32%]" tone="pink" />
+      <ValuesNeonDot className="left-[22%] bottom-[26%]" tone="pink" />
+      <ValuesNeonDot className="right-[20%] top-[48%] h-1 w-1" tone="green" />
+
+      <div
+        className="pointer-events-none absolute bottom-5 left-5 h-9 w-9 rotate-[-8deg] rounded-xl bg-gradient-to-br from-[#00ff99] to-[#ff00ff] opacity-95 shadow-[0_12px_40px_rgba(255,0,255,0.28),0_0_24px_rgba(0,255,153,0.2)]"
+        aria-hidden
+      />
+
+      <ValuesWrappedTopBar compact={compact} index={index} total={5} />
+
+      <div className="relative z-[15] flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden py-1 sm:py-2">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={index}
+            className="flex w-full flex-col items-center justify-center"
+            initial={{ opacity: 0, x: 12 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -12 }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <ValuesNeonSlidePanel compact={compact} numClass={numClass} pillClass={pillClass} />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      <div className="relative z-30 flex shrink-0 items-center justify-center gap-2 pb-0.5 pt-1" dir="ltr">
+        <button type="button" className={navBtn} disabled={index === 0} onClick={goPrev} aria-label="שקופית קודמת">
+          <ChevronLeft className="h-5 w-5" aria-hidden />
+        </button>
+        <span className="min-w-[3.25rem] text-center text-[11px] font-semibold tabular-nums text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] sm:text-xs">
+          {index + 1} / {total}
+        </span>
+        <button
+          type="button"
+          className={navBtn}
+          disabled={index === total - 1}
+          onClick={goNext}
+          aria-label="שקופית הבאה"
         >
-          <svg viewBox="0 0 32 32" className="h-9 w-9 text-blue-700">
-            <path fill="currentColor" d="M16 4l2.2 6.8H25l-5.5 4 2.1 6.7L16 17.4l-5.6 4.1 2.1-6.7L7 10.8h6.8z" />
-          </svg>
-        </div>
-      </header>
-
-      <div className="relative z-10 mt-5 flex flex-1 flex-col items-stretch gap-4">
-        <div className="flex items-center gap-3">
-          <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white shadow-xl ring-4 ring-sky-300/40 sm:h-[4.5rem] sm:w-[4.5rem]">
-            <svg viewBox="0 0 24 24" className="h-9 w-9 text-blue-800" aria-hidden>
-              <path
-                fill="currentColor"
-                d="M12 12a4 4 0 100-8 4 4 0 000 8zm-7 9a7 7 0 0114 0H5z"
-              />
-            </svg>
-            <span className="absolute -bottom-0.5 -left-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-sky-400 text-[10px] font-black text-blue-950 ring-2 ring-white sm:h-7 sm:w-7">
-              ✓
-            </span>
-          </div>
-          <div className="min-w-0 flex-1 text-right">
-            <p className={`font-black leading-tight text-white ${h2w}`}>התאמה חכמה</p>
-            <p className={`mt-1 font-black leading-snug text-sky-200 ${h2b}`}>
-              לפרופיל הפוליטי של {display}:
-            </p>
-          </div>
-        </div>
-
-        <div
-          className={`relative flex-1 rounded-2xl bg-white p-4 text-blue-950 shadow-[0_20px_50px_rgba(0,0,0,0.25)] ring-1 ring-black/5 ${card}`}
-        >
-          <div className="absolute left-3 top-3 flex items-center gap-2 text-xs font-bold text-blue-700">
-            <span>1 / 3</span>
-          </div>
-          <div className="absolute right-3 top-3 rounded-md bg-blue-700 px-2 py-1 text-xs font-black text-white">
-            01
-          </div>
-          <div className="absolute left-2 top-1/2 flex -translate-y-1/2 flex-col items-center gap-2">
-            <span className="h-16 w-1 rounded-full bg-blue-200" />
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-700 text-white shadow-md">
-              <span className="text-sm" aria-hidden>
-                ›
-              </span>
-            </span>
-          </div>
-          <p className="mx-auto max-w-[92%] pt-8 text-center font-black leading-snug">
-            את/ה אזרח/ית שמעדיף/ה גישה כלכלית ימנית של שוק חופשי ומינימום התערבות מצד המדינה.
-          </p>
-        </div>
+          <ChevronRight className="h-5 w-5" aria-hidden />
+        </button>
       </div>
     </div>
   );
 }
 
-function MiniBar({ label, value, widthPct }) {
+/** כרטיס ב׳ — ארבעה רקעים + סרגל ברים + ניווט */
+function ProfileCreative({ compact }) {
+  const total = OPTION_B_BACKGROUNDS.length;
+  const [index, setIndex] = useState(0);
+  const touchStartX = useRef(null);
+
+  const src = OPTION_B_BACKGROUNDS[index].src;
+
+  const goPrev = () => setIndex((i) => Math.max(0, i - 1));
+  const goNext = () => setIndex((i) => Math.min(total - 1, i + 1));
+
+  const onTouchStart = (e) => {
+    touchStartX.current = e.changedTouches[0]?.clientX ?? null;
+  };
+  const onTouchEnd = (e) => {
+    const start = touchStartX.current;
+    touchStartX.current = null;
+    if (start == null) return;
+    const end = e.changedTouches[0]?.clientX ?? start;
+    const dx = end - start;
+    if (dx < -48) goNext();
+    else if (dx > 48) goPrev();
+  };
+
+  const navBtn =
+    "grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/20 bg-black/40 text-white shadow-md backdrop-blur-md transition hover:bg-black/50 disabled:cursor-not-allowed disabled:opacity-35 sm:h-10 sm:w-10";
+
   return (
-    <div className="rounded-xl bg-white/5 p-3 ring-1 ring-white/10">
-      <div className="flex items-center justify-between gap-2 text-xs font-bold text-slate-200 sm:text-sm">
-        <span>{label}</span>
-        <span className="text-cyan-300">{value}</span>
+    <div
+      className="relative flex h-full min-h-0 w-full flex-col gap-2 overflow-hidden rounded-[1.35rem] bg-[#141414] p-3 shadow-[0_0_0_1px_rgba(255,255,255,0.1)] sm:gap-2.5 sm:p-4"
+      dir="rtl"
+      aria-label="קריאייטיב ב׳ — ארבעה רקעים עם דפדוף"
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+    >
+      <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.35rem] bg-[#141414]">
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={src}
+            aria-hidden
+            className="absolute inset-0 transform-gpu bg-[length:auto] bg-[position:center] bg-no-repeat"
+            style={{
+              backgroundColor: "#141414",
+              backgroundImage: `url(${src})`,
+              backgroundSize: "cover",
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          />
+        </AnimatePresence>
       </div>
-      <div className="mt-2 h-2 overflow-hidden rounded-full bg-black/40">
-        <div
-          className="h-full rounded-full bg-gradient-to-l from-cyan-300 via-sky-400 to-blue-600 shadow-[0_0_16px_rgba(34,211,238,0.45)]"
-          style={{ width: `${widthPct}%` }}
-        />
+
+      <div className="relative z-20">
+        <WrappedProgress index={index} total={total} compact={compact} />
+      </div>
+
+      <div className="relative z-[15] flex min-h-0 flex-1 flex-col items-center justify-center px-2 py-1 sm:px-4 sm:py-2">
+        <WrappedSpotifyTopicArticle compact={compact} />
+      </div>
+
+      <div className="relative z-30 flex shrink-0 items-center justify-center gap-2 pb-0.5 pt-1" dir="ltr">
+        <button type="button" className={navBtn} disabled={index === 0} onClick={goPrev} aria-label="שקופית קודמת">
+          <ChevronLeft className="h-5 w-5" aria-hidden />
+        </button>
+        <span className="min-w-[3.25rem] text-center text-[11px] font-semibold tabular-nums text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] sm:text-xs">
+          {index + 1} / {total}
+        </span>
+        <button
+          type="button"
+          className={navBtn}
+          disabled={index === total - 1}
+          onClick={goNext}
+          aria-label="שקופית הבאה"
+        >
+          <ChevronRight className="h-5 w-5" aria-hidden />
+        </button>
       </div>
     </div>
   );
 }
 
-/** כרטיס אופציה ג׳ — לוח אנליטיקה אישי / מפת בחירות */
-function MapCreative({ name, compact }) {
-  const display = resolveDisplayName(name);
-  const rid = useId().replace(/:/g, "");
-  const ringGrad = `map-ring-${rid}`;
-  const t = compact ? "text-sm sm:text-base" : "text-base sm:text-lg";
-  const eng = compact ? "text-xs sm:text-sm" : "text-sm sm:text-base";
+/** כרטיס ג׳ — רקע Year in Review + דפדוף 1–4 (כמו א׳/ב׳) */
+function MapCreative({ compact }) {
+  const total = MAP_SLIDE_COUNT;
+  const [index, setIndex] = useState(0);
+  const touchStartX = useRef(null);
+
+  const goPrev = () => setIndex((i) => Math.max(0, i - 1));
+  const goNext = () => setIndex((i) => Math.min(total - 1, i + 1));
+
+  const onTouchStart = (e) => {
+    touchStartX.current = e.changedTouches[0]?.clientX ?? null;
+  };
+  const onTouchEnd = (e) => {
+    const start = touchStartX.current;
+    touchStartX.current = null;
+    if (start == null) return;
+    const end = e.changedTouches[0]?.clientX ?? start;
+    const dx = end - start;
+    if (dx < -48) goNext();
+    else if (dx > 48) goPrev();
+  };
+
+  const { numClass, pillClass } = getWrappedTopicSlideStyles(compact);
+
+  const navBtn =
+    "grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/20 bg-black/40 text-white shadow-md backdrop-blur-md transition hover:bg-black/50 disabled:cursor-not-allowed disabled:opacity-35 sm:h-10 sm:w-10";
 
   return (
     <div
-      className="relative flex h-full min-h-0 flex-col overflow-hidden rounded-[1.35rem] bg-gradient-to-b from-[#020617] via-[#041226] to-black p-4 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.06)] sm:p-5"
+      className="relative flex h-full min-h-0 w-full flex-col gap-2 overflow-hidden rounded-[1.35rem] p-3 shadow-[0_0_0_1px_rgba(125,211,252,0.35)] sm:gap-2.5 sm:p-4"
       dir="rtl"
+      aria-label={`קריאייטיב ג׳ — שקופית ${index + 1} מתוך ${total}`}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
     >
-      <div className="pointer-events-none absolute inset-0 opacity-[0.35]" aria-hidden>
-        <div
-          className="h-full w-full"
-          style={{
-            backgroundImage:
-              "linear-gradient(to left, rgba(56,189,248,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(56,189,248,0.08) 1px, transparent 1px)",
-            backgroundSize: "22px 22px",
-          }}
-        />
-      </div>
-      <div className="pointer-events-none absolute -right-24 top-0 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl" aria-hidden />
-      <div className="pointer-events-none absolute -left-24 bottom-0 h-64 w-64 rounded-full bg-blue-600/10 blur-3xl" aria-hidden />
-
-      <div className="relative z-10 flex items-start justify-between gap-2">
-        <div className="rounded-2xl bg-white/5 px-3 py-2 text-[10px] font-bold text-cyan-200 ring-1 ring-cyan-400/25 sm:text-xs">
-          מפה אישית
-        </div>
-        <div className="text-left text-[10px] text-slate-400 sm:text-xs">2026</div>
-      </div>
-
-      <div className="relative z-10 mt-4 text-center">
-        <h3 className={`font-black ${t}`}>מפת הבחירות של {display}</h3>
-        <p className={`mt-2 font-semibold tracking-wide text-cyan-200 ${eng}`}>
-          Election 2026 Personal Map
-        </p>
-      </div>
-
-      <div className="relative z-10 mt-4 grid flex-1 grid-cols-1 gap-2.5">
-        <MiniBar label="ציר כלכלי" value="שוק חופשי" widthPct={82} />
-        <MiniBar label="ציר אזרחי" value="ליברלי" widthPct={68} />
-        <MiniBar label="ציר מנהיגות" value="פרגמטי" widthPct={74} />
-      </div>
-
-      <div className="relative z-10 mt-4 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 rounded-2xl bg-white/5 px-3 py-2 ring-1 ring-white/10">
-          <BallotIcon className="h-10 w-10" />
-          <div className="text-right">
-            <p className="text-[10px] font-bold text-slate-300 sm:text-xs">סטטוס הצבעה</p>
-            <p className="text-xs font-black text-white sm:text-sm">מוכן לשיתוף</p>
-          </div>
-        </div>
-
-        <div className="relative flex h-24 w-24 shrink-0 items-center justify-center">
-          <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
-            <defs>
-              <linearGradient id={ringGrad} x1="0" y1="0" x2="120" y2="120">
-                <stop stopColor="#22d3ee" />
-                <stop offset="1" stopColor="#3b82f6" />
-              </linearGradient>
-            </defs>
-            <circle cx="60" cy="60" r="44" stroke="rgba(255,255,255,0.08)" strokeWidth="10" fill="none" />
-            <circle
-              cx="60"
-              cy="60"
-              r="44"
-              stroke={`url(#${ringGrad})`}
-              strokeWidth="10"
-              fill="none"
-              strokeDasharray={`${2 * Math.PI * 44 * 0.87} ${2 * Math.PI * 44}`}
-              strokeLinecap="round"
+      <div
+        className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.35rem]"
+        style={{
+          background: "linear-gradient(180deg, #c4e5ff 0%, #d9efff 32%, #ecf6ff 68%, #f7fcff 100%)",
+        }}
+        aria-hidden
+      >
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={index}
+            className="absolute inset-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div
+              className="absolute inset-0 bg-gradient-to-b from-white/25 via-transparent to-sky-100/30"
+              aria-hidden
             />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-[10px] font-bold text-slate-300">התאמה כללית</span>
-            <span className="text-2xl font-black text-cyan-200 sm:text-3xl">87%</span>
-          </div>
-        </div>
+            <div
+              className="pointer-events-none absolute -left-20 top-6 h-44 w-56 rounded-full bg-white/50 blur-3xl"
+              aria-hidden
+            />
+            <div
+              className="pointer-events-none absolute -right-24 top-16 h-52 w-60 rounded-full bg-white/40 blur-3xl"
+              aria-hidden
+            />
+            <div
+              className="pointer-events-none absolute -bottom-28 left-[18%] h-48 w-[70%] max-w-md rounded-full bg-white/35 blur-3xl"
+              aria-hidden
+            />
+            <div
+              className="pointer-events-none absolute right-[8%] top-[42%] h-32 w-40 rounded-full bg-sky-100/50 blur-2xl"
+              aria-hidden
+            />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      <DuoSparkle className="absolute left-[10%] top-[20%] z-[5] h-2.5 w-2.5 opacity-95 sm:h-3 sm:w-3" />
+      <DuoSparkle className="absolute right-[14%] top-[26%] z-[5] h-2 w-2 opacity-80 sm:right-[12%]" />
+      <DuoSparkle className="absolute left-[18%] top-[55%] z-[5] h-2 w-2 opacity-75" />
+      <DuoSparkle className="absolute right-[22%] top-[48%] z-[5] h-2.5 w-2.5 opacity-90" />
+      <DuoSparkle className="absolute left-[28%] bottom-[30%] z-[5] h-2 w-2 opacity-70 sm:bottom-[28%]" />
+      <DuoSparkle className="absolute right-[30%] bottom-[22%] z-[5] h-2.5 w-2.5 opacity-85" />
+
+      <div className="relative z-20">
+        <StoryProgressBar theme="duo" compact={compact} index={index} total={total} />
+      </div>
+
+      <div className="relative z-[15] pointer-events-none flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden py-1 sm:py-2">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={index}
+            className="flex w-full flex-col items-center justify-center"
+            initial={{ opacity: 0, x: 12 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -12 }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <ValuesSlidePanel compact={compact} numClass={numClass} pillClass={pillClass} />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      <div className="relative z-30 flex shrink-0 items-center justify-center gap-2 pb-0.5 pt-1" dir="ltr">
+        <button type="button" className={navBtn} disabled={index === 0} onClick={goPrev} aria-label="שקופית קודמת">
+          <ChevronLeft className="h-5 w-5" aria-hidden />
+        </button>
+        <span className="min-w-[3.25rem] text-center text-[11px] font-semibold tabular-nums text-slate-800 sm:text-xs">
+          {index + 1} / {total}
+        </span>
+        <button
+          type="button"
+          className={navBtn}
+          disabled={index === total - 1}
+          onClick={goNext}
+          aria-label="שקופית הבאה"
+        >
+          <ChevronRight className="h-5 w-5" aria-hidden />
+        </button>
       </div>
     </div>
   );
@@ -307,14 +643,14 @@ function MapCreative({ name, compact }) {
  * רכיב הוויזואל של כרטיסי הפוסט (תוכן סטטי לתצוגה ובחירת העדפה).
  * @param {"values"|"profile"|"map"} variant
  */
-export function PostCreative({ variant, name, compact = true }) {
+export function PostCreative({ variant, compact = true }) {
   switch (variant) {
     case "values":
-      return <ValuesCreative name={name} compact={compact} />;
+      return <ValuesCreative compact={compact} />;
     case "profile":
-      return <ProfileCreative name={name} compact={compact} />;
+      return <ProfileCreative compact={compact} />;
     case "map":
-      return <MapCreative name={name} compact={compact} />;
+      return <MapCreative compact={compact} />;
     default:
       return null;
   }

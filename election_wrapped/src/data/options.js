@@ -1,6 +1,6 @@
 /**
  * שלוש אופציות הקריאייטיב לבדיקת העדפה (A/B/C).
- * כל אופציה מקושרת ל־variant שמייצג את עיצוב הכרטיס ב־PostCreative.
+ * כל אופציה מקושרת ל־variant שמייצג את עיצוב הכרטיס ב־PostCreative (תוכן סטטי, ללא שם משתמש).
  */
 export const CREATIVE_OPTIONS = [
   { id: "A", name: "סקירת ערכים", variant: "values" },

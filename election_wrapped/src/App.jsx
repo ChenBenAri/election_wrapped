@@ -17,24 +17,15 @@ ${selectedOptionName}
 איזה פרופיל יצא לכם?`;
 }
 
-function optionButtonClasses(variant) {
-  switch (variant) {
-    case "values":
-      return "bg-gradient-to-l from-[#94fbab] to-[#ff2bd6] text-slate-950 hover:brightness-110 shadow-[0_14px_40px_rgba(255,43,214,0.22)]";
-    case "profile":
-      return "bg-gradient-to-l from-sky-300 to-blue-600 text-blue-950 hover:brightness-110 shadow-[0_14px_40px_rgba(56,189,248,0.22)]";
-    case "map":
-      return "bg-gradient-to-l from-cyan-300 to-blue-700 text-slate-950 hover:brightness-110 shadow-[0_14px_40px_rgba(34,211,238,0.22)]";
-    default:
-      return "bg-white text-slate-950";
-  }
-}
+/** כפתור בחירה אחיד וניטרלי לכל האופציות */
+const OPTION_CHOOSE_BUTTON_CLASS =
+  "rounded-lg border border-slate-300 bg-[#e4e6eb] py-3.5 text-center text-base font-bold text-slate-800 shadow-sm transition hover:bg-[#d8dadf] active:scale-[0.99]";
 
-/** מעטפת בחירה: מסגרת זוהרת + אנימציה עדינה כשאופציה נבחרת */
+/** מעטפת בחירה — הדגשה בסגנון כרטיס פייסבוק */
 function selectionRingClasses(isSelected) {
   return isSelected
-    ? "ring-2 ring-cyan-300/90 shadow-[0_0_0_1px_rgba(34,211,238,0.35),0_24px_80px_rgba(34,211,238,0.18)] scale-[1.02]"
-    : "ring-1 ring-white/10 hover:ring-white/20";
+    ? "ring-2 ring-[#1877f2] shadow-[0_2px_12px_rgba(24,119,242,0.25)] scale-[1.02]"
+    : "ring-1 ring-black/[0.06] shadow-sm hover:shadow-md";
 }
 
 export default function App() {
@@ -96,38 +87,40 @@ export default function App() {
   }, [name, selected]);
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-gradient-to-b from-slate-950 via-[#0a1020] to-slate-950 text-white">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-32 top-20 h-72 w-72 rounded-full bg-fuchsia-600/10 blur-3xl" />
-        <div className="absolute -right-24 top-1/3 h-80 w-80 rounded-full bg-cyan-500/10 blur-3xl" />
-        <div className="absolute bottom-0 left-1/2 h-64 w-[min(100%,56rem)] -translate-x-1/2 rounded-[100%] bg-blue-600/5 blur-3xl" />
-      </div>
+    <div className="relative min-h-screen overflow-x-hidden bg-[#f0f2f5] text-slate-900">
+      {/* עדין כמו פייסבוק: רקע אחיד + הפרדה קלה בין אזורים */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.45]"
+        style={{
+          backgroundImage:
+            "radial-gradient(ellipse 120% 80% at 50% -20%, rgba(255,255,255,0.7), transparent 55%)",
+        }}
+        aria-hidden
+      />
 
       <main className="relative z-10 mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8" dir="rtl">
         <header className="text-center">
-          <p className="text-sm font-bold tracking-[0.2em] text-cyan-200/90 sm:text-base">
+          <p className="text-sm font-bold tracking-wide text-[#65676b] sm:text-base">
             בדיקת קריאייטיב A/B/C לפוסט פייסבוק
           </p>
-          <h1 className="mt-4 text-4xl font-black leading-tight sm:text-6xl sm:leading-tight">
+          <h1 className="mt-4 text-4xl font-black leading-tight text-slate-900 sm:text-6xl sm:leading-tight">
             בחירות 2026 WRAPPED
           </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-slate-300 sm:text-lg">
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[#65676b] sm:text-lg">
             הזינו שם, צפו בשלושה כיווני פוסט, ובחרו את הקריאייטיב שנראה הכי חזק לקמפיין.
           </p>
         </header>
 
-        <section className="mx-auto mt-12 max-w-xl">
-          <label htmlFor="user-name" className="block text-lg font-black text-slate-100">
-            השם שלך
-          </label>
+        <section className="mx-auto mt-12 flex w-full max-w-xl flex-col items-center">
           <input
             id="user-name"
             type="text"
             autoComplete="name"
-            placeholder="לדוגמה: דנה"
+            aria-label="השם שלך"
+            placeholder="השם שלך — לדוגמה: דנה"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="mt-3 w-full rounded-2xl border border-white/10 bg-white/[0.06] px-5 py-4 text-lg text-white outline-none ring-0 placeholder:text-slate-500 focus:border-cyan-400/60 focus:bg-white/[0.09] focus:shadow-[0_0_0_4px_rgba(34,211,238,0.15)]"
+            className="w-full max-w-md rounded-lg border border-slate-200 bg-white px-5 py-4 text-center text-lg text-slate-900 shadow-sm outline-none ring-0 placeholder:text-[#65676b] focus:border-[#1877f2] focus:shadow-[0_0_0_3px_rgba(24,119,242,0.2)]"
           />
         </section>
 
@@ -140,17 +133,16 @@ export default function App() {
               return (
                 <article
                   key={option.id}
-                  className={`flex flex-col rounded-3xl bg-white/[0.03] p-3 transition duration-300 sm:p-4 ${selectionRingClasses(isSelected)}`}
+                  className={`flex flex-col rounded-xl bg-white p-3 transition duration-300 sm:p-4 ${selectionRingClasses(isSelected)}`}
                 >
-                  <div className="mb-3 flex items-center justify-between px-1">
-                    <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-black text-slate-200">
+                  <div className="mb-3 px-1">
+                    <span className="inline-block rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-600">
                       אופציה {option.id}
                     </span>
-                    <span className="text-sm font-black text-cyan-200">{option.name}</span>
                   </div>
 
                   <div className="aspect-[4/5] w-full min-h-0 overflow-hidden rounded-2xl">
-                    <PostCreative variant={option.variant} name={name} compact />
+                    <PostCreative variant={option.variant} compact />
                   </div>
 
                   <button
@@ -172,7 +164,7 @@ export default function App() {
                         await refreshVotes();
                       })();
                     }}
-                    className={`mt-4 w-full rounded-2xl py-4 text-center text-base font-black transition active:scale-[0.99] ${optionButtonClasses(option.variant)}`}
+                    className={`mt-4 w-full ${OPTION_CHOOSE_BUTTON_CLASS}`}
                   >
                     בחרתי באופציה הזאת
                   </button>
@@ -195,7 +187,7 @@ export default function App() {
           />
         )}
 
-        <footer className="mt-16 pb-8 text-center text-xs leading-relaxed text-slate-500">
+        <footer className="mt-16 pb-8 text-center text-xs leading-relaxed text-[#65676b]">
           בדיקת העדפה פנימית בלבד. בפריסה ל־Vercel עם Redis (Upstash) נשמרות בחירות לצורך לוח משותף
           בלבד — ללא התחברות וללא מסד משתמשים.
         </footer>
