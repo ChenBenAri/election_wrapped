@@ -1,11 +1,8 @@
 import { PostCreative } from "./PostCreative";
 import { VotesLeaderboard } from "./VotesLeaderboard";
-import { resolveDisplayName } from "../data/options";
-
 /** אזור אישור לאחר בחירה — כרטיס לבן בסגנון פייסבוק */
 export function SelectedPreview({
   option,
-  name,
   onCopyCaption,
   copied,
   votes,
@@ -13,8 +10,6 @@ export function SelectedPreview({
   votesConfigured,
   votesFetchError,
 }) {
-  const displayName = resolveDisplayName(name);
-
   return (
     <section
       className="relative mt-14 overflow-hidden rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-10"
@@ -24,9 +19,6 @@ export function SelectedPreview({
         <h2 className="text-center text-3xl font-black text-slate-900 sm:text-4xl">הבחירה שלך</h2>
         <p className="mt-4 text-center text-lg text-[#65676b]">
           בחרת את: <span className="font-black text-[#1877f2]">{option.name}</span>
-        </p>
-        <p className="mt-1 text-center text-lg text-[#65676b]">
-          שם: <span className="font-black text-slate-900">{displayName}</span>
         </p>
 
         <div className="mx-auto mt-8 w-full max-w-md">

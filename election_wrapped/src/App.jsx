@@ -29,7 +29,6 @@ function selectionRingClasses(isSelected) {
 }
 
 export default function App() {
-  const [name, setName] = useState("");
   const [selectedId, setSelectedId] = useState(null);
   const [copied, setCopied] = useState(false);
   const [votes, setVotes] = useState([]);
@@ -75,8 +74,7 @@ export default function App() {
   /** העתקת כיתוב ניטרלי ללוח — נכשל בשקט אם הדפדפן חוסם גישה ללוח */
   const handleCopyCaption = useCallback(async () => {
     if (!selected) return;
-    const displayName = resolveDisplayName(name);
-    const text = buildFacebookCaption(displayName, selected.name);
+    const text = buildFacebookCaption(resolveDisplayName(""), selected.name);
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
@@ -84,7 +82,7 @@ export default function App() {
     } catch {
       setCopied(false);
     }
-  }, [name, selected]);
+  }, [selected]);
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#f0f2f5] text-slate-900">
@@ -100,31 +98,12 @@ export default function App() {
 
       <main className="relative z-10 mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8" dir="rtl">
         <header className="text-center">
-          <p className="text-sm font-bold tracking-wide text-[#65676b] sm:text-base">
-            בדיקת קריאייטיב A/B/C לפוסט פייסבוק
-          </p>
-          <h1 className="mt-4 text-4xl font-black leading-tight text-slate-900 sm:text-6xl sm:leading-tight">
+          <h1 className="text-4xl font-black leading-tight text-slate-900 sm:text-6xl sm:leading-tight">
             בחירות 2026 WRAPPED
           </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[#65676b] sm:text-lg">
-            הזינו שם, צפו בשלושה כיווני פוסט, ובחרו את הקריאייטיב שנראה הכי חזק לקמפיין.
-          </p>
         </header>
 
-        <section className="mx-auto mt-12 flex w-full max-w-xl flex-col items-center">
-          <input
-            id="user-name"
-            type="text"
-            autoComplete="name"
-            aria-label="השם שלך"
-            placeholder="השם שלך — לדוגמה: דנה"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full max-w-md rounded-lg border border-slate-200 bg-white px-5 py-4 text-center text-lg text-slate-900 shadow-sm outline-none ring-0 placeholder:text-[#65676b] focus:border-[#1877f2] focus:shadow-[0_0_0_3px_rgba(24,119,242,0.2)]"
-          />
-        </section>
-
-        <section className="mt-14">
+        <section className="mt-12">
           <h2 className="sr-only">שלוש אופציות קריאייטיב</h2>
           {/* בחירה: כל לחיצה מעדכנת selectedId; המעטפת מקבלת זוהר/הגדלה כשהאופציה נבחרה */}
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-6">
@@ -154,10 +133,9 @@ export default function App() {
                       }
                       setSelectedId(option.id);
                       setCopied(false);
-                      const displayName = resolveDisplayName(name);
                       void (async () => {
                         await submitVote({
-                          displayName,
+                          displayName: resolveDisplayName(""),
                           optionId: option.id,
                           optionName: option.name,
                         });
@@ -177,7 +155,6 @@ export default function App() {
         {selected && (
           <SelectedPreview
             option={selected}
-            name={name}
             onCopyCaption={handleCopyCaption}
             copied={copied}
             votes={votes}
@@ -186,11 +163,6 @@ export default function App() {
             votesFetchError={votesFetchError}
           />
         )}
-
-        <footer className="mt-16 pb-8 text-center text-xs leading-relaxed text-[#65676b]">
-          בדיקת העדפה פנימית בלבד. בפריסה ל־Vercel עם Redis (Upstash) נשמרות בחירות לצורך לוח משותף
-          בלבד — ללא התחברות וללא מסד משתמשים.
-        </footer>
       </main>
     </div>
   );

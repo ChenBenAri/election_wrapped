@@ -1,11 +1,11 @@
 /**
- * שלוש אופציות הקריאייטיב לבדיקת העדפה (A/B/C).
- * כל אופציה מקושרת ל־variant שמייצג את עיצוב הכרטיס ב־PostCreative (תוכן סטטי, ללא שם משתמש).
+ * שלוש אופציות הקריאייטיב לבדיקת העדפה (1/2/3).
+ * סדר תצוגה: 1=פרופיל (לשעבר B), 2=מפה (לשעבר C), 3=ערכים (לשעבר A).
  */
 export const CREATIVE_OPTIONS = [
-  { id: "A", name: "סקירת ערכים", variant: "values" },
-  { id: "B", name: "התאמה לפרופיל", variant: "profile" },
-  { id: "C", name: "מפת הבחירות האישית", variant: "map" },
+  { id: "1", name: "התאמה לפרופיל", variant: "profile" },
+  { id: "2", name: "מפת הבחירות האישית", variant: "map" },
+  { id: "3", name: "סקירת ערכים", variant: "values" },
 ];
 
 export function resolveDisplayName(rawName) {

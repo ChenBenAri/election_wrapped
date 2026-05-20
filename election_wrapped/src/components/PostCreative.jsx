@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Share2 } from "lucide-react";
 
 const STORY_SEGMENTS = 4;
 const STORY_FILLED = 2;
@@ -13,69 +13,271 @@ const OPTION_B_BACKGROUNDS = [
   { id: "b-red", src: "/option-b-bg-4.png" },
 ];
 
-const WRAPPED_TOPIC_TITLE = "3 הנושאים שחשובים לך בבחירות הקרובות:";
-
-const WRAPPED_TOPIC_LINES = [
+/** שקופית 1 (ובשאר השקופיות מלבד 2) */
+const DEFAULT_SLIDE_HEADLINE = "3 הנושאים שחשובים לך בבחירות הקרובות:";
+const DEFAULT_SLIDE_LINES = [
   "שוק חופשי ומינימום התערבות ממשלתית",
   "שאיפה להסדר מדיני ארוך טווח",
   "איכות מערכת החינוך",
 ];
 
-/** טקסט אופציה א׳ — סקירת ערכים (רפרנס כהה־ניאון) */
-const VALUES_NEON_HEADLINE = "3 הנושאים שחשובים לך בבחירות הקרובות:";
-const VALUES_NEON_LINES = [
-  "שוק חופשי ומינימום התערבות ממשלתית",
-  "שאיפה להסדר מדיני ארוך טווח",
-  "איכות מערכת החינוך",
+/** שקופית 2 — התאמה למועמדים (כל האופציות) */
+const CANDIDATES_SLIDE_HEADLINE = "התאמה למועמד באחוזים:";
+const CANDIDATES_SLIDE_LINES = ["יאיר לפיד 85%", "יאיר גולן 67%", "אביגדור ליברמן 43%"];
+
+/** שקופית 4 — קואליציה טבעית (כל האופציות) */
+const COALITION_SLIDE_HEADLINE = "מי הקואלציה הטבעית שלך:";
+const COALITION_SLIDE_LINES = ["מרכז", "שמאל", "ערבים"];
+
+/** שקופית 3 — מפה פוליטית (כל האופציות) */
+const POLITICAL_MAP_HEADLINE = "המפה הפוליטית שלך:";
+
+const POLITICAL_MAP_AXES = [
+  { id: "general", label: "קפיטליסט", dotSide: "right" },
+  { id: "political", label: "שמאלני", dotSide: "left", dotLeft: "24%" },
+  { id: "social", label: "ליברלי", dotSide: "left" },
 ];
 
-/** טקסט אופציה ג׳ — נושאי בחירות (נפרד מא׳) */
-const VALUES_WRAPPED_HEADLINE = "3 הנושאים שחשובים לך בבחירות הקרובות:";
-const VALUES_WRAPPED_LINES = [
-  "שוק חופשי ומינימום התערבות ממשלתית",
-  "שאיפה להסדר מדיני ארוך טווח",
-  "איכות מערכת החינוך",
-];
+const POLITICAL_MAP_DOT_LEFT = { right: "82%", left: "12%" };
+
+function getSlideCopy(slideIndex) {
+  if (slideIndex === 1) {
+    return { headline: CANDIDATES_SLIDE_HEADLINE, lines: CANDIDATES_SLIDE_LINES };
+  }
+  if (slideIndex === 3) {
+    return { headline: COALITION_SLIDE_HEADLINE, lines: COALITION_SLIDE_LINES };
+  }
+  return { headline: DEFAULT_SLIDE_HEADLINE, lines: DEFAULT_SLIDE_LINES };
+}
+
+const POLITICAL_MAP_THEMES = {
+  neon: {
+    headline: "text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]",
+    axis: "bg-gradient-to-r from-white/15 via-white/35 to-white/15",
+    tick: "bg-white/25",
+    dot: "border-[#ff2bd6] bg-[#ff2bd6] shadow-[0_0_12px_rgba(255,43,214,0.65)]",
+    label: "text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]",
+    rowBg: "",
+  },
+  light: {
+    headline: "text-slate-900",
+    axis: "bg-gradient-to-r from-slate-200 via-slate-400 to-slate-200",
+    tick: "bg-slate-300",
+    dot: "border-blue-600 bg-blue-500 shadow-[0_0_10px_rgba(37,99,235,0.35)]",
+    label: "text-slate-900",
+    rowBg: "",
+  },
+  spotify: {
+    headline: "text-neutral-950",
+    axis: "bg-gradient-to-r from-neutral-300 via-neutral-500 to-neutral-300",
+    tick: "bg-neutral-400",
+    dot: "border-neutral-900 bg-neutral-800 shadow-[0_2px_8px_rgba(0,0,0,0.35)]",
+    label: "text-neutral-950",
+    rowBg: "",
+  },
+  /** אופציה 1 (פרופיל) — מפה פוליטית עם טקסט לבן על רקע כהה */
+  profile: {
+    headline: "text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)]",
+    axis: "bg-gradient-to-r from-white/20 via-white/45 to-white/20",
+    tick: "bg-white/35",
+    dot: "border-white bg-white shadow-[0_0_12px_rgba(255,255,255,0.55)]",
+    label: "text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)]",
+    rowBg: "",
+  },
+};
+
+/** ציר אופקי עם נקודה ותווית מעליה */
+function PoliticalAxisRow({ label, dotSide, dotLeft: dotLeftOverride, theme, compact }) {
+  const t = POLITICAL_MAP_THEMES[theme];
+  const dotLeft = dotLeftOverride ?? POLITICAL_MAP_DOT_LEFT[dotSide];
+
+  return (
+    <li className="w-full">
+      <div className={`relative w-full ${compact ? "h-9" : "h-10"}`} dir="ltr">
+        <span
+          className={`pointer-events-none absolute bottom-[calc(50%+10px)] -translate-x-1/2 whitespace-nowrap text-[0.68rem] font-black leading-none sm:text-xs ${t.label}`}
+          style={{ left: dotLeft }}
+        >
+          {label}
+        </span>
+        <span className={`absolute left-0 top-1/2 h-2 w-0.5 -translate-y-1/2 rounded-full ${t.tick}`} aria-hidden />
+        <span className={`absolute right-0 top-1/2 h-2 w-0.5 -translate-y-1/2 rounded-full ${t.tick}`} aria-hidden />
+        <span className={`absolute left-1 right-1 top-1/2 h-[2px] -translate-y-1/2 rounded-full ${t.axis}`} aria-hidden />
+        <span
+          className={`absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 sm:h-4 sm:w-4 ${t.dot}`}
+          style={{ left: dotLeft }}
+          aria-hidden
+        />
+      </div>
+    </li>
+  );
+}
+
+/** שקופית 3 — מפה פוליטית עם צירים מצוירים */
+function PoliticalMapSlidePanel({ theme, compact }) {
+  const t = POLITICAL_MAP_THEMES[theme];
+  const headlineClass = compact
+    ? `max-w-[19.5rem] text-balance text-center text-[0.95rem] font-black leading-[1.22] tracking-[-0.018em] sm:text-[1.05rem] ${t.headline}`
+    : `max-w-[21rem] text-balance text-center text-[1.05rem] font-black leading-[1.2] tracking-[-0.018em] sm:text-[1.2rem] ${t.headline}`;
+
+  const inner = (
+    <div className="pointer-events-none flex w-full flex-col items-center justify-center gap-2 px-2 sm:gap-2.5">
+      <h2 className={headlineClass}>{POLITICAL_MAP_HEADLINE}</h2>
+      <ul className={`mt-1 w-full space-y-3 sm:mt-1.5 sm:space-y-3.5 ${compact ? "max-w-[17.5rem]" : "max-w-[19rem]"}`}>
+        {POLITICAL_MAP_AXES.map((axis) => (
+          <PoliticalAxisRow
+            key={axis.id}
+            label={axis.label}
+            dotSide={axis.dotSide}
+            dotLeft={axis.dotLeft}
+            theme={theme}
+            compact={compact}
+          />
+        ))}
+      </ul>
+    </div>
+  );
+
+  if (theme === "spotify" || theme === "profile") {
+    const articleClass =
+      theme === "profile"
+        ? compact
+          ? "relative overflow-hidden rounded-2xl border border-white/15 bg-black/55 px-3 py-5 shadow-[0_12px_36px_rgba(0,0,0,0.45)] backdrop-blur-md sm:px-4 sm:py-6"
+          : "relative overflow-hidden rounded-[1.35rem] border border-white/18 bg-black/50 px-4 py-6 shadow-[0_16px_44px_rgba(0,0,0,0.4)] backdrop-blur-md sm:px-5 sm:py-8"
+        : compact
+          ? "relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0a0a0a]/88 px-3 py-5 shadow-[0_12px_36px_rgba(0,0,0,0.5)] backdrop-blur-[2px] sm:px-4 sm:py-6"
+          : "relative overflow-hidden rounded-[1.35rem] border border-white/[0.09] bg-[#0a0a0a]/85 px-4 py-6 shadow-[0_16px_44px_rgba(0,0,0,0.48)] backdrop-blur-[2px] sm:px-5 sm:py-8";
+    return (
+      <div className="pointer-events-none w-full max-w-[min(100%,26rem)] select-none sm:max-w-[28rem]">
+        <article className={articleClass}>{inner}</article>
+      </div>
+    );
+  }
+
+  return inner;
+}
 
 const VALUES_SLIDE_COUNT = 4;
 const MAP_SLIDE_COUNT = 4;
 
-/** סרגל עליון (אופציה א׳) — 5 מקטעים: 3 אפורים, 2 בגרדיאנט ירוק→ורוד */
+/** מעבר שקופית: קדימה = נכנס משמאל, יוצא ימינה (כיוון עברית) */
+const rtlSlideVariants = {
+  enter: (dir) => ({ opacity: 0, x: dir > 0 ? -16 : 16 }),
+  center: { opacity: 1, x: 0 },
+  exit: (dir) => ({ opacity: 0, x: dir > 0 ? 16 : -16 }),
+};
+
+const rtlSlideTransition = { duration: 0.28, ease: [0.22, 1, 0.36, 1] };
+
+const SHARE_BTN_THEMES = {
+  neon: "border-white/20 bg-black/40 text-white shadow-md backdrop-blur-md hover:bg-black/55",
+  profile: "border-white/20 bg-black/40 text-white shadow-md backdrop-blur-md hover:bg-black/50",
+  duo: "border-sky-200/90 bg-white/85 text-sky-800 shadow-sm backdrop-blur-sm hover:bg-white",
+};
+
+async function handleCreativeShare() {
+  const url = window.location.href;
+  const payload = { title: "בחירות 2026 WRAPPED", text: "הפרופיל הבחירותי שלי", url };
+  try {
+    if (navigator.share) {
+      await navigator.share(payload);
+      return;
+    }
+    await navigator.clipboard.writeText(url);
+  } catch (err) {
+    if (err?.name === "AbortError") return;
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
+/** כפתור שיתוף — באותה עמודה כמו ✕ למעלה, ובאותה שורה כמו חצי הניווט */
+function CreativeShareButton({ theme }) {
+  return (
+    <button
+      type="button"
+      onClick={() => void handleCreativeShare()}
+      className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border transition active:scale-95 ${SHARE_BTN_THEMES[theme]}`}
+      aria-label="שתף"
+    >
+      <Share2 className="h-3.5 w-3.5" aria-hidden />
+    </button>
+  );
+}
+
+const CREATIVE_NAV_BTN =
+  "grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/20 bg-black/40 text-white shadow-md backdrop-blur-md transition hover:bg-black/50 disabled:cursor-not-allowed disabled:opacity-35 sm:h-10 sm:w-10";
+
+/** שורת תחתית — חצים במרכז, שיתוף בעמודת היציאה (ימין ב־LTR) */
+function CreativeBottomBar({ theme, index, total, goNext, goPrev, counterClassName }) {
+  return (
+    <div className="relative z-30 flex shrink-0 items-center justify-between gap-2.5 px-0.5 pb-0.5 pt-1" dir="ltr">
+      <div className="h-8 w-8 shrink-0" aria-hidden />
+      <div className="flex items-center justify-center gap-2">
+        <button type="button" className={CREATIVE_NAV_BTN} disabled={index === total - 1} onClick={goNext} aria-label="שקופית הבאה">
+          <ChevronLeft className="h-5 w-5" aria-hidden />
+        </button>
+        <span
+          className={`min-w-[3.25rem] text-center text-[11px] font-semibold tabular-nums sm:text-xs ${counterClassName}`}
+        >
+          {index + 1} / {total}
+        </span>
+        <button type="button" className={CREATIVE_NAV_BTN} disabled={index === 0} onClick={goPrev} aria-label="שקופית קודמת">
+          <ChevronRight className="h-5 w-5" aria-hidden />
+        </button>
+      </div>
+      <CreativeShareButton theme={theme} />
+    </div>
+  );
+}
+
+function useSlidePager(total) {
+  const [[index, direction], setSlide] = useState([0, 0]);
+  const touchStartX = useRef(null);
+
+  const goNext = () => {
+    setSlide(([i]) => (i < total - 1 ? [i + 1, 1] : [i, 1]));
+  };
+  const goPrev = () => {
+    setSlide(([i]) => (i > 0 ? [i - 1, -1] : [i, -1]));
+  };
+
+  const onTouchStart = (e) => {
+    touchStartX.current = e.changedTouches[0]?.clientX ?? null;
+  };
+  const onTouchEnd = (e) => {
+    const start = touchStartX.current;
+    touchStartX.current = null;
+    if (start == null) return;
+    const dx = (e.changedTouches[0]?.clientX ?? start) - start;
+    if (dx < -48) goNext();
+    else if (dx > 48) goPrev();
+  };
+
+  return { index, direction, goNext, goPrev, onTouchStart, onTouchEnd };
+}
+
+/** סרגל עליון (אופציה א׳) — מקטעים לפי שקופית (LTR, כמו אופציה ב׳) */
 function ValuesWrappedTopBar({ compact, index, total }) {
   const h = compact ? "h-[3px] sm:h-1" : "h-1 sm:h-[5px]";
   const gap = compact ? "gap-1" : "gap-1.5";
-  const useStoryStyle = total === 5;
 
   return (
     <div className="relative z-20 flex shrink-0 items-center justify-between gap-2.5 px-0.5 pt-1" dir="ltr">
-      <div className={`flex min-w-0 flex-1 justify-center ${gap}`} aria-hidden>
-        {useStoryStyle ? (
-          <>
-            {[0, 1, 2].map((i) => (
-              <span
-                key={i}
-                className={`${h} flex-1 rounded-full bg-zinc-800/95 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] ring-1 ring-black/40`}
-              />
-            ))}
-            {[3, 4].map((i) => (
-              <span
-                key={i}
-                className={`${h} flex-1 rounded-full bg-gradient-to-r from-[#00ff99] to-[#ff00ff] shadow-[0_0_14px_rgba(0,255,153,0.35),0_0_18px_rgba(255,0,255,0.25)]`}
-              />
-            ))}
-          </>
-        ) : (
-          Array.from({ length: total }).map((_, i) => (
-            <span
-              key={i}
-              className={
-                i <= index
-                  ? `${h} flex-1 rounded-full bg-gradient-to-r from-[#00ff99] to-[#ff00ff] shadow-[0_0_14px_rgba(0,255,153,0.35),0_0_18px_rgba(255,0,255,0.25)]`
-                  : `${h} flex-1 rounded-full bg-zinc-800/95 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] ring-1 ring-black/40`
-              }
-            />
-          ))
-        )}
+      <div className={`flex min-w-0 flex-1 justify-center ${gap}`} dir="rtl" aria-hidden>
+        {Array.from({ length: total }).map((_, i) => (
+          <span
+            key={i}
+            className={
+              i <= index
+                ? `${h} flex-1 rounded-full bg-gradient-to-r from-[#00ff99] to-[#ff00ff] shadow-[0_0_14px_rgba(0,255,153,0.35),0_0_18px_rgba(255,0,255,0.25)]`
+                : `${h} flex-1 rounded-full bg-zinc-800/95 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] ring-1 ring-black/40`
+            }
+          />
+        ))}
       </div>
       <span
         className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/50 text-[15px] font-light leading-none text-white/75 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm"
@@ -88,7 +290,12 @@ function ValuesWrappedTopBar({ compact, index, total }) {
 }
 
 /** טקסט נושאים בסגנון Spotify Wrapped — לאופציה ב׳ */
-function WrappedSpotifyTopicArticle({ compact }) {
+function WrappedSpotifyTopicArticle({ compact, slideIndex }) {
+  if (slideIndex === 2) {
+    return <PoliticalMapSlidePanel theme="profile" compact={compact} />;
+  }
+
+  const { headline, lines } = getSlideCopy(slideIndex);
   const articleClass = compact
     ? "relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0a0a0a]/88 px-3 py-5 shadow-[0_12px_36px_rgba(0,0,0,0.5)] backdrop-blur-[2px] sm:px-4 sm:py-6"
     : "relative overflow-hidden rounded-[1.35rem] border border-white/[0.09] bg-[#0a0a0a]/85 px-4 py-6 shadow-[0_16px_44px_rgba(0,0,0,0.48)] backdrop-blur-[2px] sm:px-5 sm:py-8";
@@ -113,7 +320,7 @@ function WrappedSpotifyTopicArticle({ compact }) {
                 : "inline-block max-w-full rounded-[2px] bg-[#ebebeb] px-2.5 py-1.5 text-center text-base font-black leading-[1.08] tracking-[-0.055em] text-neutral-950 sm:px-3 sm:py-2 sm:text-lg"
             }
           >
-            {WRAPPED_TOPIC_TITLE}
+            {headline}
           </span>
         </p>
 
@@ -125,7 +332,7 @@ function WrappedSpotifyTopicArticle({ compact }) {
               : "relative z-[1] mt-5 list-none space-y-4 ps-4 pe-3 sm:mt-6 sm:space-y-5 sm:ps-5 sm:pe-4"
           }
         >
-          {WRAPPED_TOPIC_LINES.map((line, i) => (
+          {lines.map((line, i) => (
             <li key={line} className="flex w-full justify-start">
               <div className="flex max-w-full items-baseline gap-2.5 sm:gap-3">
                 <span className={numClass}>{i + 1}</span>
@@ -152,7 +359,7 @@ function WrappedProgress({ index, total, compact }) {
   return (
     <div
       className={`relative z-20 flex shrink-0 ${compact ? "gap-1" : "gap-2"}`}
-      dir="ltr"
+      dir="rtl"
       aria-hidden
     >
       {Array.from({ length: total }).map((_, i) => (
@@ -214,8 +421,8 @@ function StoryProgressBar({ theme, compact, index, total }) {
         : "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/35 bg-black/45 text-sm font-light text-white shadow-md backdrop-blur-md";
 
   return (
-    <div className="relative z-10 flex items-center justify-between gap-2 px-0.5 pt-0.5">
-      <div className="flex min-w-0 flex-1 justify-center gap-1.5">
+    <div className="relative z-10 flex items-center justify-between gap-2 px-0.5 pt-0.5" dir="ltr">
+      <div className="flex min-w-0 flex-1 justify-center gap-1.5" dir="rtl">
         {Array.from({ length: segmentCount }).map((_, i) => (
           <span key={i} className={segmentClass(isFilled(i))} aria-hidden />
         ))}
@@ -263,7 +470,13 @@ function getValuesNeonSlideStyles(compact) {
 }
 
 /** תוכן שקופית אופציה א׳ — סקירת ערכים (רפרנס) */
-function ValuesNeonSlidePanel({ compact, numClass, pillClass }) {
+function ValuesNeonSlidePanel({ compact, numClass, pillClass, slideIndex }) {
+  if (slideIndex === 2) {
+    return <PoliticalMapSlidePanel theme="neon" compact={compact} />;
+  }
+
+  const { headline, lines } = getSlideCopy(slideIndex);
+
   return (
     <div className="pointer-events-none flex w-full flex-col items-center justify-center gap-1.5 px-2 sm:gap-2">
       <h2
@@ -273,11 +486,11 @@ function ValuesNeonSlidePanel({ compact, numClass, pillClass }) {
             : "max-w-[21rem] text-balance text-center text-[1.05rem] font-black leading-[1.2] tracking-[-0.018em] text-white sm:text-[1.2rem]"
         }
       >
-        {VALUES_NEON_HEADLINE}
+        {headline}
       </h2>
 
       <ul className="mt-2 w-full max-w-[18.5rem] space-y-2 sm:mt-2.5 sm:max-w-[20.5rem] sm:space-y-2.5">
-        {VALUES_NEON_LINES.map((line, idx) => (
+        {lines.map((line, idx) => (
           <li key={line} className="flex justify-center">
             <div className={pillClass}>
               <span className={numClass}>{idx + 1}</span>
@@ -305,7 +518,13 @@ function getWrappedTopicSlideStyles(compact) {
 }
 
 /** תוכן שקופית בודדת — כותרת, תת־כותרת ורשימה (אופציות א׳ ו־ג׳) */
-function ValuesSlidePanel({ compact, numClass, pillClass }) {
+function ValuesSlidePanel({ compact, numClass, pillClass, slideIndex }) {
+  if (slideIndex === 2) {
+    return <PoliticalMapSlidePanel theme="light" compact={compact} />;
+  }
+
+  const { headline, lines } = getSlideCopy(slideIndex);
+
   return (
     <div className="flex w-full flex-col items-center justify-center gap-1.5 px-2 sm:gap-2">
       <h2
@@ -315,11 +534,11 @@ function ValuesSlidePanel({ compact, numClass, pillClass }) {
             : "max-w-[21rem] text-balance text-center text-[1.05rem] font-black leading-[1.2] tracking-[-0.018em] text-slate-900 sm:text-[1.2rem]"
         }
       >
-        {VALUES_WRAPPED_HEADLINE}
+        {headline}
       </h2>
 
       <ul className="mt-2 w-full max-w-[18.5rem] space-y-2 sm:mt-2.5 sm:max-w-[20.5rem] sm:space-y-2.5">
-        {VALUES_WRAPPED_LINES.map((line, idx) => (
+        {lines.map((line, idx) => (
           <li key={line} className="flex justify-center">
             <div className={pillClass}>
               <span className={numClass}>{idx + 1}</span>
@@ -337,30 +556,10 @@ function ValuesSlidePanel({ compact, numClass, pillClass }) {
 /** כרטיס א׳ — רפרנס כהה־ניאון + דפדוף 1–4 */
 function ValuesCreative({ compact }) {
   const total = VALUES_SLIDE_COUNT;
-  const [index, setIndex] = useState(0);
-  const touchStartX = useRef(null);
+  const { index, direction, goNext, goPrev, onTouchStart, onTouchEnd } = useSlidePager(total);
   const grainOpacity = compact ? 0.52 : 0.58;
 
-  const goPrev = () => setIndex((i) => Math.max(0, i - 1));
-  const goNext = () => setIndex((i) => Math.min(total - 1, i + 1));
-
-  const onTouchStart = (e) => {
-    touchStartX.current = e.changedTouches[0]?.clientX ?? null;
-  };
-  const onTouchEnd = (e) => {
-    const start = touchStartX.current;
-    touchStartX.current = null;
-    if (start == null) return;
-    const end = e.changedTouches[0]?.clientX ?? start;
-    const dx = end - start;
-    if (dx < -48) goNext();
-    else if (dx > 48) goPrev();
-  };
-
   const { numClass, pillClass } = getValuesNeonSlideStyles(compact);
-
-  const navBtn =
-    "grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/20 bg-black/40 text-white shadow-md backdrop-blur-md transition hover:bg-black/50 disabled:cursor-not-allowed disabled:opacity-35 sm:h-10 sm:w-10";
 
   return (
     <div
@@ -396,40 +595,33 @@ function ValuesCreative({ compact }) {
         aria-hidden
       />
 
-      <ValuesWrappedTopBar compact={compact} index={index} total={5} />
+      <ValuesWrappedTopBar compact={compact} index={index} total={total} />
 
       <div className="relative z-[15] flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden py-1 sm:py-2">
-        <AnimatePresence mode="wait" initial={false}>
+        <AnimatePresence mode="wait" custom={direction} initial={false}>
           <motion.div
             key={index}
+            custom={direction}
+            variants={rtlSlideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={rtlSlideTransition}
             className="flex w-full flex-col items-center justify-center"
-            initial={{ opacity: 0, x: 12 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -12 }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           >
-            <ValuesNeonSlidePanel compact={compact} numClass={numClass} pillClass={pillClass} />
+            <ValuesNeonSlidePanel compact={compact} numClass={numClass} pillClass={pillClass} slideIndex={index} />
           </motion.div>
         </AnimatePresence>
       </div>
 
-      <div className="relative z-30 flex shrink-0 items-center justify-center gap-2 pb-0.5 pt-1" dir="ltr">
-        <button type="button" className={navBtn} disabled={index === 0} onClick={goPrev} aria-label="שקופית קודמת">
-          <ChevronLeft className="h-5 w-5" aria-hidden />
-        </button>
-        <span className="min-w-[3.25rem] text-center text-[11px] font-semibold tabular-nums text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] sm:text-xs">
-          {index + 1} / {total}
-        </span>
-        <button
-          type="button"
-          className={navBtn}
-          disabled={index === total - 1}
-          onClick={goNext}
-          aria-label="שקופית הבאה"
-        >
-          <ChevronRight className="h-5 w-5" aria-hidden />
-        </button>
-      </div>
+      <CreativeBottomBar
+        theme="neon"
+        index={index}
+        total={total}
+        goNext={goNext}
+        goPrev={goPrev}
+        counterClassName="text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
+      />
     </div>
   );
 }
@@ -437,29 +629,9 @@ function ValuesCreative({ compact }) {
 /** כרטיס ב׳ — ארבעה רקעים + סרגל ברים + ניווט */
 function ProfileCreative({ compact }) {
   const total = OPTION_B_BACKGROUNDS.length;
-  const [index, setIndex] = useState(0);
-  const touchStartX = useRef(null);
+  const { index, direction, goNext, goPrev, onTouchStart, onTouchEnd } = useSlidePager(total);
 
   const src = OPTION_B_BACKGROUNDS[index].src;
-
-  const goPrev = () => setIndex((i) => Math.max(0, i - 1));
-  const goNext = () => setIndex((i) => Math.min(total - 1, i + 1));
-
-  const onTouchStart = (e) => {
-    touchStartX.current = e.changedTouches[0]?.clientX ?? null;
-  };
-  const onTouchEnd = (e) => {
-    const start = touchStartX.current;
-    touchStartX.current = null;
-    if (start == null) return;
-    const end = e.changedTouches[0]?.clientX ?? start;
-    const dx = end - start;
-    if (dx < -48) goNext();
-    else if (dx > 48) goPrev();
-  };
-
-  const navBtn =
-    "grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/20 bg-black/40 text-white shadow-md backdrop-blur-md transition hover:bg-black/50 disabled:cursor-not-allowed disabled:opacity-35 sm:h-10 sm:w-10";
 
   return (
     <div
@@ -470,9 +642,14 @@ function ProfileCreative({ compact }) {
       onTouchEnd={onTouchEnd}
     >
       <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.35rem] bg-[#141414]">
-        <AnimatePresence initial={false}>
+        <AnimatePresence custom={direction} initial={false}>
           <motion.div
-            key={src}
+            key={index}
+            custom={direction}
+            variants={rtlSlideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
             aria-hidden
             className="absolute inset-0 transform-gpu bg-[length:auto] bg-[position:center] bg-no-repeat"
             style={{
@@ -480,10 +657,7 @@ function ProfileCreative({ compact }) {
               backgroundImage: `url(${src})`,
               backgroundSize: "cover",
             }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
           />
         </AnimatePresence>
       </div>
@@ -492,27 +666,31 @@ function ProfileCreative({ compact }) {
         <WrappedProgress index={index} total={total} compact={compact} />
       </div>
 
-      <div className="relative z-[15] flex min-h-0 flex-1 flex-col items-center justify-center px-2 py-1 sm:px-4 sm:py-2">
-        <WrappedSpotifyTopicArticle compact={compact} />
+      <div className="relative z-[15] flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden px-2 py-1 sm:px-4 sm:py-2">
+        <AnimatePresence mode="wait" custom={direction} initial={false}>
+          <motion.div
+            key={index}
+            custom={direction}
+            variants={rtlSlideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={rtlSlideTransition}
+            className="flex w-full flex-col items-center justify-center"
+          >
+            <WrappedSpotifyTopicArticle compact={compact} slideIndex={index} />
+          </motion.div>
+        </AnimatePresence>
       </div>
 
-      <div className="relative z-30 flex shrink-0 items-center justify-center gap-2 pb-0.5 pt-1" dir="ltr">
-        <button type="button" className={navBtn} disabled={index === 0} onClick={goPrev} aria-label="שקופית קודמת">
-          <ChevronLeft className="h-5 w-5" aria-hidden />
-        </button>
-        <span className="min-w-[3.25rem] text-center text-[11px] font-semibold tabular-nums text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] sm:text-xs">
-          {index + 1} / {total}
-        </span>
-        <button
-          type="button"
-          className={navBtn}
-          disabled={index === total - 1}
-          onClick={goNext}
-          aria-label="שקופית הבאה"
-        >
-          <ChevronRight className="h-5 w-5" aria-hidden />
-        </button>
-      </div>
+      <CreativeBottomBar
+        theme="profile"
+        index={index}
+        total={total}
+        goNext={goNext}
+        goPrev={goPrev}
+        counterClassName="text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
+      />
     </div>
   );
 }
@@ -520,29 +698,9 @@ function ProfileCreative({ compact }) {
 /** כרטיס ג׳ — רקע Year in Review + דפדוף 1–4 (כמו א׳/ב׳) */
 function MapCreative({ compact }) {
   const total = MAP_SLIDE_COUNT;
-  const [index, setIndex] = useState(0);
-  const touchStartX = useRef(null);
-
-  const goPrev = () => setIndex((i) => Math.max(0, i - 1));
-  const goNext = () => setIndex((i) => Math.min(total - 1, i + 1));
-
-  const onTouchStart = (e) => {
-    touchStartX.current = e.changedTouches[0]?.clientX ?? null;
-  };
-  const onTouchEnd = (e) => {
-    const start = touchStartX.current;
-    touchStartX.current = null;
-    if (start == null) return;
-    const end = e.changedTouches[0]?.clientX ?? start;
-    const dx = end - start;
-    if (dx < -48) goNext();
-    else if (dx > 48) goPrev();
-  };
+  const { index, direction, goNext, goPrev, onTouchStart, onTouchEnd } = useSlidePager(total);
 
   const { numClass, pillClass } = getWrappedTopicSlideStyles(compact);
-
-  const navBtn =
-    "grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/20 bg-black/40 text-white shadow-md backdrop-blur-md transition hover:bg-black/50 disabled:cursor-not-allowed disabled:opacity-35 sm:h-10 sm:w-10";
 
   return (
     <div
@@ -559,14 +717,16 @@ function MapCreative({ compact }) {
         }}
         aria-hidden
       >
-        <AnimatePresence initial={false}>
+        <AnimatePresence custom={direction} initial={false}>
           <motion.div
             key={index}
-            className="absolute inset-0"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            custom={direction}
+            variants={rtlSlideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute inset-0"
           >
             <div
               className="absolute inset-0 bg-gradient-to-b from-white/25 via-transparent to-sky-100/30"
@@ -604,37 +764,30 @@ function MapCreative({ compact }) {
       </div>
 
       <div className="relative z-[15] pointer-events-none flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden py-1 sm:py-2">
-        <AnimatePresence mode="wait" initial={false}>
+        <AnimatePresence mode="wait" custom={direction} initial={false}>
           <motion.div
             key={index}
+            custom={direction}
+            variants={rtlSlideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={rtlSlideTransition}
             className="flex w-full flex-col items-center justify-center"
-            initial={{ opacity: 0, x: 12 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -12 }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           >
-            <ValuesSlidePanel compact={compact} numClass={numClass} pillClass={pillClass} />
+            <ValuesSlidePanel compact={compact} numClass={numClass} pillClass={pillClass} slideIndex={index} />
           </motion.div>
         </AnimatePresence>
       </div>
 
-      <div className="relative z-30 flex shrink-0 items-center justify-center gap-2 pb-0.5 pt-1" dir="ltr">
-        <button type="button" className={navBtn} disabled={index === 0} onClick={goPrev} aria-label="שקופית קודמת">
-          <ChevronLeft className="h-5 w-5" aria-hidden />
-        </button>
-        <span className="min-w-[3.25rem] text-center text-[11px] font-semibold tabular-nums text-slate-800 sm:text-xs">
-          {index + 1} / {total}
-        </span>
-        <button
-          type="button"
-          className={navBtn}
-          disabled={index === total - 1}
-          onClick={goNext}
-          aria-label="שקופית הבאה"
-        >
-          <ChevronRight className="h-5 w-5" aria-hidden />
-        </button>
-      </div>
+      <CreativeBottomBar
+        theme="duo"
+        index={index}
+        total={total}
+        goNext={goNext}
+        goPrev={goPrev}
+        counterClassName="text-slate-800"
+      />
     </div>
   );
 }
