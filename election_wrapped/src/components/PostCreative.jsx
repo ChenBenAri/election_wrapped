@@ -23,12 +23,10 @@ const COALITION_SLIDE_LINES = ["מרכז", "שמאל", "ערבים"];
 const POLITICAL_MAP_HEADLINE = "המפה הפוליטית שלך:";
 
 const POLITICAL_MAP_AXES = [
-  { id: "general", label: "קפיטליסט", dotSide: "right" },
-  { id: "political", label: "שמאלני", dotSide: "left", dotLeft: "24%" },
-  { id: "social", label: "ליברלי", dotSide: "left" },
+  { id: "economic", leftLabel: "סוציאליסט", rightLabel: "קפיטליסט", dotLeft: "78%" },
+  { id: "security", leftLabel: ["שמאלני", "ביטחונית"], rightLabel: ["ימני", "ביטחונית"], dotLeft: "24%" },
+  { id: "social", leftLabel: "ליברלי", rightLabel: "שמרן", dotLeft: "68%" },
 ];
-
-const POLITICAL_MAP_DOT_LEFT = { right: "82%", left: "12%" };
 
 const SLIDE_COUNT = 4;
 
@@ -146,26 +144,54 @@ const POLITICAL_MAP_STYLE = {
   label: "text-slate-900",
 };
 
-function PoliticalAxisRow({ label, dotSide, dotLeft: dotLeftOverride, compact }) {
-  const dotLeft = dotLeftOverride ?? POLITICAL_MAP_DOT_LEFT[dotSide];
+function AxisEndLabel({ label }) {
+  const labelClass = `text-[0.8125rem] font-black leading-none sm:text-[0.9375rem] ${POLITICAL_MAP_STYLE.label}`;
+
+  if (Array.isArray(label)) {
+    return (
+      <span className="flex flex-col items-center gap-0.5 text-center">
+        {label.map((line) => (
+          <span key={line} className={`${labelClass} whitespace-nowrap`}>
+            {line}
+          </span>
+        ))}
+      </span>
+    );
+  }
+
+  return <span className={`${labelClass} whitespace-nowrap text-center`}>{label}</span>;
+}
+
+function PoliticalAxisRow({ leftLabel, rightLabel, dotLeft, compact }) {
+  const isMultiline = Array.isArray(leftLabel) || Array.isArray(rightLabel);
+  const rowHeight = isMultiline
+    ? compact
+      ? "h-[4.25rem]"
+      : "h-[4.5rem]"
+    : compact
+      ? "h-[3.25rem]"
+      : "h-14";
 
   return (
     <li className="w-full">
-      <div className={`relative w-full ${compact ? "h-11" : "h-12"}`} dir="ltr">
-        <span
-          className={`pointer-events-none absolute bottom-[calc(50%+12px)] -translate-x-1/2 whitespace-nowrap text-[0.9375rem] font-black leading-none sm:text-[1.0625rem] ${POLITICAL_MAP_STYLE.label}`}
-          style={{ left: dotLeft }}
-        >
-          {label}
-        </span>
-        <span className={`absolute left-0 top-1/2 h-2 w-0.5 -translate-y-1/2 rounded-full ${POLITICAL_MAP_STYLE.tick}`} aria-hidden />
-        <span className={`absolute right-0 top-1/2 h-2 w-0.5 -translate-y-1/2 rounded-full ${POLITICAL_MAP_STYLE.tick}`} aria-hidden />
-        <span className={`absolute left-1 right-1 top-1/2 h-[2px] -translate-y-1/2 rounded-full ${POLITICAL_MAP_STYLE.axis}`} aria-hidden />
-        <span
-          className={`absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 sm:h-4 sm:w-4 ${POLITICAL_MAP_STYLE.dot}`}
-          style={{ left: dotLeft }}
-          aria-hidden
-        />
+      <div className={`relative w-full ${rowHeight}`} dir="ltr">
+        <div className="absolute inset-x-7 top-1/2 -translate-y-1/2 sm:inset-x-9">
+          <div className="absolute bottom-[calc(100%+0.625rem)] left-0 -translate-x-1/2">
+            <AxisEndLabel label={leftLabel} />
+          </div>
+          <div className="absolute bottom-[calc(100%+0.625rem)] right-0 translate-x-1/2">
+            <AxisEndLabel label={rightLabel} />
+          </div>
+
+          <span className={`absolute left-0 top-0 h-2.5 w-0.5 -translate-x-1/2 -translate-y-1/2 rounded-full ${POLITICAL_MAP_STYLE.tick}`} aria-hidden />
+          <span className={`absolute right-0 top-0 h-2.5 w-0.5 translate-x-1/2 -translate-y-1/2 rounded-full ${POLITICAL_MAP_STYLE.tick}`} aria-hidden />
+          <span className={`absolute left-0 right-0 top-0 h-[2.5px] -translate-y-1/2 rounded-full ${POLITICAL_MAP_STYLE.axis}`} aria-hidden />
+          <span
+            className={`absolute top-0 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 sm:h-4 sm:w-4 ${POLITICAL_MAP_STYLE.dot}`}
+            style={{ left: dotLeft }}
+            aria-hidden
+          />
+        </div>
       </div>
     </li>
   );
@@ -173,14 +199,14 @@ function PoliticalAxisRow({ label, dotSide, dotLeft: dotLeftOverride, compact })
 
 function PoliticalMapSlidePanel({ compact }) {
   return (
-    <div className="pointer-events-none flex w-full flex-col items-center justify-center gap-2.5 px-2 sm:gap-3">
+    <div className="pointer-events-none flex w-full flex-col items-center justify-center gap-2.5 px-1 sm:gap-3 sm:px-2">
       <h2 className={getContentSlideHeadlineClass(compact)}>{POLITICAL_MAP_HEADLINE}</h2>
-      <ul className={`mt-1 w-full space-y-3.5 sm:mt-1.5 sm:space-y-4 ${compact ? "max-w-[19rem]" : "max-w-[21rem]"}`}>
+      <ul className={`mt-1 w-full space-y-3.5 sm:mt-1.5 sm:space-y-4 ${compact ? "max-w-[22.5rem]" : "max-w-[25rem]"}`}>
         {POLITICAL_MAP_AXES.map((axis) => (
           <PoliticalAxisRow
             key={axis.id}
-            label={axis.label}
-            dotSide={axis.dotSide}
+            leftLabel={axis.leftLabel}
+            rightLabel={axis.rightLabel}
             dotLeft={axis.dotLeft}
             compact={compact}
           />
