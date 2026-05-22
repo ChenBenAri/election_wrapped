@@ -60,7 +60,7 @@ function FirstSlideIdentityLine({ compact }) {
     : "text-[0.75rem] leading-none tracking-[0.16em] sm:text-[0.8125rem]";
 
   return (
-    <div className="relative z-20 flex w-full shrink-0 justify-center px-2 pb-0.5 pt-12 sm:px-3 sm:pb-1 sm:pt-14">
+    <div className="relative z-20 flex w-full shrink-0 justify-center px-2 pb-0.5 pt-16 sm:px-3 sm:pb-1 sm:pt-[4.75rem]">
       <div
         className={`flex max-w-[min(100%,22rem)] flex-col items-center gap-1.5 sm:gap-2 ${FIRST_SLIDE_IDENTITY_STYLE.frame}`}
         aria-label={FIRST_SLIDE_IDENTITY_LINE}
@@ -85,13 +85,15 @@ function FirstSlideIdentityLine({ compact }) {
   );
 }
 
+const HEADLINE_BLUE = "text-[#0f4c9a] drop-shadow-[0_1px_0_rgba(255,255,255,0.85)]";
+
 function getTopicsHeadlineClass(compact) {
   const layout = compact
     ? "w-full px-0.5 text-center font-black leading-none tracking-[-0.04em] whitespace-nowrap"
     : "max-w-none text-center font-black leading-[1.08] tracking-[-0.032em] whitespace-nowrap";
   const size = compact ? "text-[1.25rem] sm:text-[1.4375rem]" : "text-[1.625rem] sm:text-[1.875rem]";
 
-  return `${layout} ${size} text-[#0f4c9a] drop-shadow-[0_1px_0_rgba(255,255,255,0.85)] -mt-1`;
+  return `${layout} ${size} ${HEADLINE_BLUE} -mt-1`;
 }
 
 function getListLineClass(compact, enlarged = false, topicsSlide = false) {
@@ -115,7 +117,7 @@ function getContentSlideHeadlineClass(compact) {
   const size = compact ? "text-[1.3125rem] sm:text-[1.5rem]" : "text-[1.5rem] sm:text-[1.8125rem]";
   const maxW = compact ? "max-w-[20rem]" : "max-w-[22rem]";
 
-  return `${maxW} ${layout} ${size} text-slate-900`;
+  return `${maxW} ${layout} ${size} ${HEADLINE_BLUE}`;
 }
 
 function getSlideNumClass(compact, enlarged = false, topicsSlide = false) {
@@ -217,45 +219,9 @@ async function handleCreativeShare() {
 
 const SHARE_BTN_POSITION = "absolute bottom-1 left-1 z-40 sm:bottom-1.5 sm:left-1.5";
 
-const BRAND_MARK_STYLE = {
-  wrap: "rounded-2xl ring-1 ring-sky-200/90 shadow-[0_4px_16px_rgba(73,174,249,0.15)] backdrop-blur-sm",
-  wrapBg: "bg-gradient-to-br from-white/95 via-sky-50/90 to-[#dbeafe]/85",
-  wrapAccentA: "left-0 top-0 h-full w-[50%] bg-gradient-to-r from-[#49AEF9]/12 to-transparent",
-  wrapAccentB: "right-1 top-1 h-6 w-10 rounded-full bg-white/70 blur-sm",
-  monogramInner:
-    "grid h-7 w-7 place-items-center rounded-full border-2 border-[#49AEF9] bg-white sm:h-8 sm:w-8",
-  year: "text-[0.6875rem] font-black tabular-nums leading-none text-slate-800 sm:text-xs",
-  hebrew: "text-[0.6875rem] font-bold leading-none tracking-tight text-slate-800 sm:text-xs",
-  chip: "rounded-full bg-[#49AEF9]/15 px-1.5 py-0.5 text-[0.4375rem] font-bold uppercase tracking-[0.24em] text-[#1877f2] sm:text-[0.5rem]",
-};
-
-function CreativeBrandMark() {
-  return (
-    <div
-      className={`pointer-events-none relative inline-flex shrink-0 overflow-hidden ${BRAND_MARK_STYLE.wrap}`}
-      dir="ltr"
-      aria-hidden
-    >
-      <span className={`absolute inset-0 ${BRAND_MARK_STYLE.wrapBg}`} />
-      <span className={`absolute ${BRAND_MARK_STYLE.wrapAccentA}`} />
-      <span className={`absolute ${BRAND_MARK_STYLE.wrapAccentB}`} />
-      <span className="relative z-[1] inline-flex items-center gap-2 px-2 py-1.5">
-        <span className={BRAND_MARK_STYLE.monogramInner}>
-          <span className={BRAND_MARK_STYLE.year}>26</span>
-        </span>
-        <span className="flex flex-col items-center gap-0.5 leading-none">
-          <span className={`text-center ${BRAND_MARK_STYLE.hebrew}`}>בחירות</span>
-          <span className={BRAND_MARK_STYLE.chip}>wrapped</span>
-        </span>
-      </span>
-    </div>
-  );
-}
-
 function CreativeTopHeader({ children }) {
   return (
-    <div className="relative z-20 flex shrink-0 items-center gap-2 px-0.5 pt-1" dir="ltr">
-      <CreativeBrandMark />
+    <div className="relative z-20 flex shrink-0 items-center px-2.5 pt-3 sm:px-3 sm:pt-3.5" dir="ltr">
       <div className="flex min-w-0 flex-1 items-center">{children}</div>
     </div>
   );
@@ -279,7 +245,7 @@ const USER_DISCLAIMER = "אני משתמש מספר 8 שלוקח אחריות ע
 
 function CreativeBottomFooter() {
   return (
-    <div className="relative z-30 mb-3 w-full shrink-0 -translate-y-2 px-2 pb-0.5 pt-0.5 sm:mb-4 sm:-translate-y-2.5">
+    <div className="relative z-30 mb-3 w-full shrink-0 -translate-y-8 px-2 pb-0.5 pt-0.5 sm:mb-4 sm:-translate-y-8">
       <div className="pointer-events-none space-y-0.5 text-center text-sm font-semibold leading-snug text-slate-600/85 sm:text-base">
         <p>{AI_DISCLAIMER}</p>
         <p>{USER_DISCLAIMER}</p>
@@ -400,9 +366,15 @@ function getSlidePanelStyles(compact) {
   };
 }
 
+const SLIDE_PANEL_OFFSET = "-translate-y-10 sm:-translate-y-10";
+
 function MapSlidePanel({ compact, pillClass, slideIndex }) {
   if (slideIndex === 2) {
-    return <PoliticalMapSlidePanel compact={compact} />;
+    return (
+      <div className={`flex w-full flex-col items-center ${SLIDE_PANEL_OFFSET}`}>
+        <PoliticalMapSlidePanel compact={compact} />
+      </div>
+    );
   }
 
   const { headline, lines } = getSlideCopy(slideIndex);
@@ -410,7 +382,9 @@ function MapSlidePanel({ compact, pillClass, slideIndex }) {
   const numClass = getSlideNumClass(compact, !isTopicsSlide, isTopicsSlide);
 
   return (
-    <div className="flex w-full flex-col items-center justify-center gap-1.5 px-1 sm:gap-2 sm:px-2">
+    <div
+      className={`flex w-full flex-col items-center justify-center gap-1.5 px-1 sm:gap-2 sm:px-2 ${SLIDE_PANEL_OFFSET}`}
+    >
       <h2 className={isTopicsSlide ? getTopicsHeadlineClass(compact) : getContentSlideHeadlineClass(compact)}>
         {headline}
       </h2>
@@ -418,7 +392,7 @@ function MapSlidePanel({ compact, pillClass, slideIndex }) {
       <ul
         className={`w-full space-y-2 sm:space-y-2.5 ${
           isTopicsSlide
-            ? "mt-2 max-w-[min(100%,21.5rem)] sm:mt-2.5 sm:max-w-[23rem]"
+            ? "mt-4 max-w-[min(100%,21.5rem)] sm:mt-4.5 sm:max-w-[23rem]"
             : "mt-3 max-w-[20rem] sm:mt-3.5 sm:max-w-[22rem]"
         }`}
       >
@@ -483,7 +457,7 @@ function MapCreative({ compact }) {
         <StoryProgressBar compact={compact} index={index} total={SLIDE_COUNT} />
       </CreativeTopHeader>
 
-      {index === 0 && <FirstSlideIdentityLine compact={compact} />}
+      <FirstSlideIdentityLine compact={compact} />
 
       <div className="relative z-[15] flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden py-1 sm:py-2">
         <StoryTapZones onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} onPagerClick={onPagerClick} />
