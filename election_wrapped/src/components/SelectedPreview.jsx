@@ -23,7 +23,7 @@ export function SelectedPreview({
 
         <div className="mx-auto mt-8 w-full max-w-md">
           <div className="aspect-[4/5] w-full overflow-hidden rounded-xl border border-slate-200 shadow-md ring-1 ring-black/[0.04]">
-            <PostCreative variant={option.variant} compact={false} />
+            <PostCreative compact={false} />
           </div>
         </div>
 

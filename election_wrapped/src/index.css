@@ -3,7 +3,8 @@
 html,
 body,
 #root {
-  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
@@ -12,6 +13,22 @@ body {
   font-family: "Heebo", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   background-color: #f0f2f5;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  html,
+  body,
+  #root {
+    height: auto;
+    min-height: 100%;
+    overflow: visible;
+  }
+
+  body {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
 }
 
 /* Subtle film grain for “wrapped” polish */
