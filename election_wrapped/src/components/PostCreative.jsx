@@ -1,6 +1,5 @@
 import { useRef, useState, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Share2 } from "lucide-react";
 
 const FIRST_SLIDE_IDENTITY_LINE = "תעודת הזהות הפוליטית שלי";
 const FIRST_SLIDE_IDENTITY_PARTS = {
@@ -62,7 +61,7 @@ function FirstSlideIdentityLine({ compact }) {
     : "text-[0.9375rem] leading-none tracking-[0.16em] sm:text-[1rem]";
 
   return (
-    <div className="relative z-20 flex w-full shrink-0 justify-center px-2 pb-0.5 pt-16 sm:px-3 sm:pb-1 sm:pt-[4.75rem]">
+    <div className="relative z-20 flex w-full shrink-0 justify-center px-2 pb-0.5 pt-16 sm:px-3 sm:pb-3 sm:pt-14">
       <div
         className={`flex max-w-[min(100%,28rem)] flex-col items-center gap-3 sm:gap-3.5 ${FIRST_SLIDE_IDENTITY_STYLE.frame}`}
         aria-label={FIRST_SLIDE_IDENTITY_LINE}
@@ -215,9 +214,9 @@ function PoliticalAxisRow({ leftLabel, rightLabel, dotLeft, compact }) {
 
 function PoliticalMapSlidePanel({ compact }) {
   return (
-    <div className="pointer-events-none flex w-full flex-col items-center justify-center gap-2.5 px-1 sm:gap-3 sm:px-2">
+    <div className="pointer-events-none flex w-full flex-col items-center justify-center gap-2.5 px-1 sm:gap-4 sm:px-2">
       <h2 className={getContentSlideHeadlineClass(compact)}>{POLITICAL_MAP_HEADLINE}</h2>
-      <ul className={`mt-6 w-full space-y-3.5 sm:mt-7 sm:space-y-4 ${compact ? "max-w-[22.5rem]" : "max-w-[25rem]"}`}>
+      <ul className={`mt-6 w-full space-y-3.5 sm:mt-8 sm:space-y-5 ${compact ? "max-w-[22.5rem]" : "max-w-[25rem]"}`}>
         {POLITICAL_MAP_AXES.map((axis) => (
           <PoliticalAxisRow
             key={axis.id}
@@ -240,27 +239,6 @@ const rtlSlideVariants = {
 
 const rtlSlideTransition = { duration: 0.28, ease: [0.22, 1, 0.36, 1] };
 
-async function handleCreativeShare() {
-  const url = window.location.href;
-  const payload = { url };
-  try {
-    if (navigator.share) {
-      await navigator.share(payload);
-      return;
-    }
-    await navigator.clipboard.writeText(url);
-  } catch (err) {
-    if (err?.name === "AbortError") return;
-    try {
-      await navigator.clipboard.writeText(url);
-    } catch {
-      /* ignore */
-    }
-  }
-}
-
-const SHARE_BTN_POSITION = "absolute bottom-1 left-1 z-40 sm:bottom-1.5 sm:left-1.5";
-
 function CreativeTopHeader({ children }) {
   return (
     <div className="relative z-20 flex shrink-0 items-center px-2.5 pt-3 sm:px-3 sm:pt-3.5" dir="ltr">
@@ -269,30 +247,34 @@ function CreativeTopHeader({ children }) {
   );
 }
 
-function CreativeShareButton({ className = "" }) {
-  return (
-    <button
-      type="button"
-      onClick={() => void handleCreativeShare()}
-      className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border border-sky-200/90 bg-white/85 text-sky-800 shadow-sm backdrop-blur-sm transition hover:bg-white active:scale-95 ${className}`}
-      aria-label="שתף"
-    >
-      <Share2 className="h-3.5 w-3.5" aria-hidden />
-    </button>
-  );
-}
-
 const AI_DISCLAIMER = "התאמה זו בוצעה באמצעות AI";
 const USER_DISCLAIMER = "אני משתמש מספר 8 שלוקח אחריות על הבחירות";
+const FOOTER_CTA = "גלו את שלכם";
+const FOOTER_SITE_LABEL = "PoliticalID.co.il";
+const FOOTER_SITE_URL = "https://PoliticalID.co.il";
 
 function CreativeBottomFooter() {
   return (
-    <div className="relative z-30 mb-3 w-full shrink-0 -translate-y-8 px-2 pb-0.5 pt-0.5 sm:mb-4 sm:-translate-y-8">
-      <div className="pointer-events-none space-y-0.5 text-center text-sm font-semibold leading-snug text-slate-600/85 sm:text-base">
-        <p>{AI_DISCLAIMER}</p>
-        <p>{USER_DISCLAIMER}</p>
+    <>
+      <div className="relative z-30 mb-3 w-full shrink-0 -translate-y-[5.25rem] px-2 pb-0.5 pt-0.5 sm:mb-4 sm:-translate-y-[2.5rem]">
+        <div className="pointer-events-none space-y-0.5 text-center text-sm font-semibold leading-snug text-slate-600/85 sm:space-y-1 sm:text-base">
+          <p>{AI_DISCLAIMER}</p>
+          <p>{USER_DISCLAIMER}</p>
+        </div>
       </div>
-    </div>
+
+      <div className="absolute inset-x-0 bottom-10 z-30 space-y-0.5 px-2 text-center text-sm font-semibold leading-snug text-slate-600/85 sm:bottom-6 sm:space-y-1 sm:text-base">
+        <p className="pointer-events-none">{FOOTER_CTA}</p>
+        <a
+          href={FOOTER_SITE_URL}
+          className="inline-block text-[#1877f2] transition hover:text-[#166fe5] hover:underline"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {FOOTER_SITE_LABEL}
+        </a>
+      </div>
+    </>
   );
 }
 
@@ -407,13 +389,13 @@ function DuoSparkle({ className }) {
 function getSlidePanelStyles(compact) {
   return {
     pillClass: compact
-      ? "flex w-full min-w-0 items-center gap-3 px-1 py-1 sm:px-1.5 sm:py-1.5"
-      : "flex w-full min-w-0 items-center gap-3.5 px-1.5 py-1.5 sm:px-2 sm:py-2",
+      ? "flex w-full min-w-0 items-center gap-3 px-1 py-1 sm:gap-4 sm:px-1.5 sm:py-1.5"
+      : "flex w-full min-w-0 items-center gap-3.5 px-1.5 py-1.5 sm:gap-4 sm:px-2 sm:py-2",
   };
 }
 
-const SLIDE_PANEL_OFFSET = "-translate-y-10 sm:-translate-y-10";
-const TOPICS_SLIDE_WEB_OFFSET = "-translate-y-10 sm:-translate-y-7";
+const SLIDE_PANEL_OFFSET = "-translate-y-10 sm:-translate-y-6";
+const TOPICS_SLIDE_WEB_OFFSET = "-translate-y-10 sm:-translate-y-3";
 
 function MapSlidePanel({ compact, pillClass, slideIndex }) {
   if (slideIndex === 2) {
@@ -432,7 +414,7 @@ function MapSlidePanel({ compact, pillClass, slideIndex }) {
 
   return (
     <div
-      className={`flex w-full flex-col items-center justify-center gap-1.5 px-1 sm:gap-2 sm:px-2 ${panelOffset}`}
+      className={`flex w-full flex-col items-center justify-center gap-1.5 px-1 sm:gap-3 sm:px-2 ${panelOffset}`}
     >
       {isTopicsSlide ? (
         <TopicsHeadline compact={compact} />
@@ -443,8 +425,8 @@ function MapSlidePanel({ compact, pillClass, slideIndex }) {
       <ul
         className={
           isTopicsSlide
-            ? "mt-4 w-full max-w-[min(100%,24rem)] space-y-3 sm:mt-5 sm:max-w-[26rem] sm:space-y-3.5"
-            : "mt-3 w-full max-w-[20rem] space-y-2 sm:mt-3.5 sm:max-w-[22rem] sm:space-y-2.5"
+            ? "mt-4 w-full max-w-[min(100%,24rem)] space-y-3 sm:mt-6 sm:max-w-[26rem] sm:space-y-4"
+            : "mt-3 w-full max-w-[20rem] space-y-2 sm:mt-4 sm:max-w-[22rem] sm:space-y-3"
         }
       >
         {lines.map((line, idx) => (
@@ -508,7 +490,7 @@ function MapCreative({ compact }) {
 
       <FirstSlideIdentityLine compact={compact} />
 
-      <div className="relative z-[15] flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden py-1 sm:py-2">
+      <div className="relative z-[15] flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden py-1 sm:py-3">
         <StoryTapZones onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} onPagerClick={onPagerClick} />
         <AnimatePresence mode="wait" custom={direction} initial={false}>
           <motion.div
@@ -526,7 +508,6 @@ function MapCreative({ compact }) {
         </AnimatePresence>
       </div>
 
-      <CreativeShareButton className={SHARE_BTN_POSITION} />
       <CreativeBottomFooter />
     </div>
   );
