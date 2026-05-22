@@ -25,7 +25,7 @@ const POLITICAL_MAP_HEADLINE = "המפה הפוליטית שלך:";
 const POLITICAL_MAP_AXES = [
   { id: "economic", leftLabel: "סוציאליסט", rightLabel: "קפיטליסט", dotLeft: "78%" },
   { id: "security", leftLabel: ["שמאלני", "ביטחונית"], rightLabel: ["ימני", "ביטחונית"], dotLeft: "24%" },
-  { id: "social", leftLabel: "ליברלי", rightLabel: "שמרן", dotLeft: "68%" },
+  { id: "social", leftLabel: "ליברלי", rightLabel: "שמרן", dotLeft: "9%" },
 ];
 
 const SLIDE_COUNT = 4;
