@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Share2 } from "lucide-react";
+import { Share2 } from "lucide-react";
 
 const STORY_SEGMENTS = 4;
 const STORY_FILLED = 2;
@@ -194,13 +194,101 @@ async function handleCreativeShare() {
   }
 }
 
-/** כפתור שיתוף — באותה עמודה כמו ✕ למעלה, ובאותה שורה כמו חצי הניווט */
-function CreativeShareButton({ theme }) {
+const SHARE_BTN_POSITION = "absolute bottom-1 left-1 z-40 sm:bottom-1.5 sm:left-1.5";
+
+const BRAND_MARK_STYLES = {
+  neon: {
+    wrap: "rounded-2xl ring-1 ring-white/15 shadow-[0_4px_24px_rgba(255,43,214,0.14)] backdrop-blur-md",
+    wrapBg:
+      "bg-gradient-to-br from-[#3d1a5c]/90 via-[#0a0318]/92 to-[#1a3d2e]/88",
+    wrapAccentA: "left-0 top-0 h-full w-[55%] bg-gradient-to-r from-[#94fbab]/18 to-transparent",
+    wrapAccentB: "bottom-0 right-0 h-8 w-8 rounded-full bg-[#ff2bd6]/25 blur-lg",
+    monogramOuter: "rounded-full bg-gradient-to-br from-[#94fbab] to-[#ff2bd6] p-px",
+    monogramInner: "grid h-7 w-7 place-items-center rounded-full bg-[#0a0318] sm:h-8 sm:w-8",
+    year: "text-[0.6875rem] font-black tabular-nums leading-none text-white sm:text-xs",
+    hebrew: "text-[0.6875rem] font-bold leading-none tracking-tight text-white sm:text-xs",
+    chip: "rounded-full bg-white/10 px-1.5 py-0.5 text-[0.4375rem] font-bold uppercase tracking-[0.24em] text-[#94fbab] sm:text-[0.5rem]",
+  },
+  profile: {
+    wrap: "rounded-2xl ring-1 ring-white/30 shadow-[0_4px_20px_rgba(0,0,0,0.45)] backdrop-blur-md",
+    wrapBg: "bg-gradient-to-br from-black/85 via-zinc-900/75 to-black/88",
+    wrapAccentA: "inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.12),transparent_55%)]",
+    wrapAccentB: "bottom-0 right-0 h-10 w-10 bg-gradient-to-tl from-white/10 to-transparent",
+    monogramOuter: "",
+    monogramInner:
+      "grid h-7 w-7 place-items-center rounded-full border-2 border-white bg-white/10 sm:h-8 sm:w-8",
+    year: "text-[0.6875rem] font-black tabular-nums leading-none text-white drop-shadow-md sm:text-xs",
+    hebrew:
+      "text-[0.6875rem] font-bold leading-none tracking-tight text-white drop-shadow-md sm:text-xs",
+    chip: "rounded-full bg-white/20 px-1.5 py-0.5 text-[0.4375rem] font-bold uppercase tracking-[0.24em] text-white sm:text-[0.5rem]",
+  },
+  duo: {
+    wrap: "rounded-2xl ring-1 ring-sky-200/90 shadow-[0_4px_16px_rgba(73,174,249,0.15)] backdrop-blur-sm",
+    wrapBg: "bg-gradient-to-br from-white/95 via-sky-50/90 to-[#dbeafe]/85",
+    wrapAccentA: "left-0 top-0 h-full w-[50%] bg-gradient-to-r from-[#49AEF9]/12 to-transparent",
+    wrapAccentB: "right-1 top-1 h-6 w-10 rounded-full bg-white/70 blur-sm",
+    monogramOuter: "",
+    monogramInner:
+      "grid h-7 w-7 place-items-center rounded-full border-2 border-[#49AEF9] bg-white sm:h-8 sm:w-8",
+    year: "text-[0.6875rem] font-black tabular-nums leading-none text-slate-800 sm:text-xs",
+    hebrew: "text-[0.6875rem] font-bold leading-none tracking-tight text-slate-800 sm:text-xs",
+    chip: "rounded-full bg-[#49AEF9]/15 px-1.5 py-0.5 text-[0.4375rem] font-bold uppercase tracking-[0.24em] text-[#1877f2] sm:text-[0.5rem]",
+  },
+};
+
+/** לוגו — monogram עגול + wordmark מודרני */
+function CreativeBrandMark({ theme }) {
+  const s = BRAND_MARK_STYLES[theme];
+
+  const monogram = s.monogramOuter ? (
+    <span className={s.monogramOuter}>
+      <span className={s.monogramInner}>
+        <span className={s.year}>26</span>
+      </span>
+    </span>
+  ) : (
+    <span className={s.monogramInner}>
+      <span className={s.year}>26</span>
+    </span>
+  );
+
+  return (
+    <div
+      className={`pointer-events-none relative inline-flex shrink-0 overflow-hidden ${s.wrap}`}
+      dir="ltr"
+      aria-hidden
+    >
+      <span className={`absolute inset-0 ${s.wrapBg}`} />
+      <span className={`absolute ${s.wrapAccentA}`} />
+      <span className={`absolute ${s.wrapAccentB}`} />
+      <span className="relative z-[1] inline-flex items-center gap-2 px-2 py-1.5">
+        {monogram}
+        <span className="flex flex-col items-center gap-0.5 leading-none">
+          <span className={`text-center ${s.hebrew}`}>בחירות</span>
+          <span className={s.chip}>wrapped</span>
+        </span>
+      </span>
+    </div>
+  );
+}
+
+/** שורת עליונה — לוגו בשמאל, ברים לידו */
+function CreativeTopHeader({ theme, children }) {
+  return (
+    <div className="relative z-20 flex shrink-0 items-center gap-2 px-0.5 pt-1" dir="ltr">
+      <CreativeBrandMark theme={theme} />
+      <div className="flex min-w-0 flex-1 items-center">{children}</div>
+    </div>
+  );
+}
+
+/** כפתור שיתוף */
+function CreativeShareButton({ theme, className = "" }) {
   return (
     <button
       type="button"
       onClick={() => void handleCreativeShare()}
-      className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border transition active:scale-95 ${SHARE_BTN_THEMES[theme]}`}
+      className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border transition active:scale-95 ${SHARE_BTN_THEMES[theme]} ${className}`}
       aria-label="שתף"
     >
       <Share2 className="h-3.5 w-3.5" aria-hidden />
@@ -208,56 +296,108 @@ function CreativeShareButton({ theme }) {
   );
 }
 
-const CREATIVE_NAV_BTN =
-  "grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/20 bg-black/40 text-white shadow-md backdrop-blur-md transition hover:bg-black/50 disabled:cursor-not-allowed disabled:opacity-35 sm:h-10 sm:w-10";
+const AI_DISCLAIMER = "התאמה זו בוצעה באמצעות AI";
+const USER_DISCLAIMER = "אני משתמש מספר 8 שלוקח אחריות על הבחירות";
 
-/** שורת תחתית — חצים במרכז, שיתוף בעמודת היציאה (ימין ב־LTR) */
-function CreativeBottomBar({ theme, index, total, goNext, goPrev, counterClassName }) {
+const FOOTER_DISCLAIMER_THEMES = {
+  neon: { text: "text-white/55", wrap: "" },
+  profile: {
+    text: "text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]",
+    wrap: "mx-auto max-w-[94%] rounded-lg bg-black/60 px-3 py-2 ring-1 ring-white/20 shadow-[0_4px_18px_rgba(0,0,0,0.45)] backdrop-blur-md",
+  },
+  duo: { text: "text-slate-600/85", wrap: "" },
+};
+
+/** שורת תחתית — הצהרות במרכז (כפתור שיתוף ממוקם בנפרד בפינה) */
+function CreativeBottomFooter({ theme }) {
+  const { text, wrap } = FOOTER_DISCLAIMER_THEMES[theme];
+  const textClass = `pointer-events-none text-center text-sm font-semibold leading-snug sm:text-base ${text}`;
+
   return (
-    <div className="relative z-30 flex shrink-0 items-center justify-between gap-2.5 px-0.5 pb-0.5 pt-1" dir="ltr">
-      <div className="h-8 w-8 shrink-0" aria-hidden />
-      <div className="flex items-center justify-center gap-2">
-        <button type="button" className={CREATIVE_NAV_BTN} disabled={index === total - 1} onClick={goNext} aria-label="שקופית הבאה">
-          <ChevronLeft className="h-5 w-5" aria-hidden />
-        </button>
-        <span
-          className={`min-w-[3.25rem] text-center text-[11px] font-semibold tabular-nums sm:text-xs ${counterClassName}`}
-        >
-          {index + 1} / {total}
-        </span>
-        <button type="button" className={CREATIVE_NAV_BTN} disabled={index === 0} onClick={goPrev} aria-label="שקופית קודמת">
-          <ChevronRight className="h-5 w-5" aria-hidden />
-        </button>
+    <div className="relative z-30 mb-2 w-full shrink-0 px-2 pb-0.5 pt-0.5 sm:mb-2.5">
+      <div className={`space-y-0.5 ${wrap} ${textClass}`}>
+        <p>{AI_DISCLAIMER}</p>
+        <p>{USER_DISCLAIMER}</p>
       </div>
-      <CreativeShareButton theme={theme} />
     </div>
+  );
+}
+
+/** אזורי לחיצה בצדי המסך — שמאל: הבא, ימין: קודם (סטורי RTL) */
+function StoryTapZones({ onTouchStart, onTouchEnd, onPagerClick }) {
+  return (
+    <div
+      data-story-pager
+      className="absolute inset-0 z-[25] touch-manipulation"
+      dir="ltr"
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+      onClick={onPagerClick}
+      aria-hidden
+    />
   );
 }
 
 function useSlidePager(total) {
   const [[index, direction], setSlide] = useState([0, 0]);
-  const touchStartX = useRef(null);
+  const touchStart = useRef(null);
+  const suppressClick = useRef(false);
 
-  const goNext = () => {
+  const goNext = useCallback(() => {
     setSlide(([i]) => (i < total - 1 ? [i + 1, 1] : [i, 1]));
-  };
-  const goPrev = () => {
+  }, [total]);
+
+  const goPrev = useCallback(() => {
     setSlide(([i]) => (i > 0 ? [i - 1, -1] : [i, -1]));
-  };
+  }, []);
+
+  const navigateFromX = useCallback(
+    (clientX, element) => {
+      const el = element.closest("[data-story-pager]") ?? element;
+      const rect = el.getBoundingClientRect();
+      if (rect.width <= 0) return;
+      const ratio = (clientX - rect.left) / rect.width;
+      if (ratio < 0.5) goNext();
+      else goPrev();
+    },
+    [goNext, goPrev],
+  );
 
   const onTouchStart = (e) => {
-    touchStartX.current = e.changedTouches[0]?.clientX ?? null;
-  };
-  const onTouchEnd = (e) => {
-    const start = touchStartX.current;
-    touchStartX.current = null;
-    if (start == null) return;
-    const dx = (e.changedTouches[0]?.clientX ?? start) - start;
-    if (dx < -48) goNext();
-    else if (dx > 48) goPrev();
+    const t = e.changedTouches[0];
+    if (!t) return;
+    touchStart.current = { x: t.clientX, y: t.clientY };
   };
 
-  return { index, direction, goNext, goPrev, onTouchStart, onTouchEnd };
+  const onTouchEnd = (e) => {
+    const start = touchStart.current;
+    touchStart.current = null;
+    if (!start) return;
+    const t = e.changedTouches[0];
+    if (!t) return;
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+    if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy)) {
+      suppressClick.current = true;
+      if (dx < 0) goNext();
+      else goPrev();
+      return;
+    }
+    if (Math.abs(dx) < 12 && Math.abs(dy) < 12) {
+      suppressClick.current = true;
+      navigateFromX(t.clientX, e.currentTarget);
+    }
+  };
+
+  const onPagerClick = (e) => {
+    if (suppressClick.current) {
+      suppressClick.current = false;
+      return;
+    }
+    navigateFromX(e.clientX, e.currentTarget);
+  };
+
+  return { index, direction, goNext, goPrev, onTouchStart, onTouchEnd, onPagerClick };
 }
 
 /** סרגל עליון (אופציה א׳) — מקטעים לפי שקופית (LTR, כמו אופציה ב׳) */
@@ -266,8 +406,8 @@ function ValuesWrappedTopBar({ compact, index, total }) {
   const gap = compact ? "gap-1" : "gap-1.5";
 
   return (
-    <div className="relative z-20 flex shrink-0 items-center justify-between gap-2.5 px-0.5 pt-1" dir="ltr">
-      <div className={`flex min-w-0 flex-1 justify-center ${gap}`} dir="rtl" aria-hidden>
+    <div className="flex min-w-0 flex-1" dir="ltr">
+      <div className={`flex min-w-0 flex-1 ${gap}`} dir="rtl" aria-hidden>
         {Array.from({ length: total }).map((_, i) => (
           <span
             key={i}
@@ -279,12 +419,6 @@ function ValuesWrappedTopBar({ compact, index, total }) {
           />
         ))}
       </div>
-      <span
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/50 text-[15px] font-light leading-none text-white/75 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm"
-        aria-hidden
-      >
-        ✕
-      </span>
     </div>
   );
 }
@@ -358,7 +492,7 @@ function WrappedSpotifyTopicArticle({ compact, slideIndex }) {
 function WrappedProgress({ index, total, compact }) {
   return (
     <div
-      className={`relative z-20 flex shrink-0 ${compact ? "gap-1" : "gap-2"}`}
+      className={`relative z-20 flex min-w-0 flex-1 ${compact ? "gap-1" : "gap-2"}`}
       dir="rtl"
       aria-hidden
     >
@@ -390,7 +524,7 @@ function DuoSparkle({ className }) {
   );
 }
 
-/** סרגל “סטורי” — מספר חלונות + מיקום נוכחי (מקטעים + ✕), בסגנון לפי theme */
+/** סרגל “סטורי” — מקטעי התקדמות (אופציה 2 — מפה) */
 function StoryProgressBar({ theme, compact, index, total }) {
   const segmentCount = total ?? STORY_SEGMENTS;
   const isFilled = (i) => (index != null && total != null ? i <= index : i < STORY_FILLED);
@@ -406,55 +540,20 @@ function StoryProgressBar({ theme, compact, index, total }) {
     if (theme === "duo") {
       return filled
         ? `h-1.5 rounded-full bg-[#49AEF9] shadow-[0_1px_6px_rgba(73,174,249,0.55)] ${stretchW}`
-        : `h-1.5 rounded-full border border-dashed border-sky-300/75 bg-white/65 ${stretchW}`;
+        : `h-1.5 rounded-full bg-sky-200/55 ${stretchW}`;
     }
     return filled
       ? `h-1.5 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.35)] ${stretchW}`
       : `h-1.5 rounded-full border border-dashed border-white/40 bg-white/15 ${stretchW}`;
   };
 
-  const closeClass =
-    theme === "neon"
-      ? "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/30 text-sm font-light text-white/80 shadow-inner"
-      : theme === "duo"
-        ? "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-sky-200/90 bg-white/85 text-sm font-light text-sky-800 shadow-sm backdrop-blur-sm"
-        : "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/35 bg-black/45 text-sm font-light text-white shadow-md backdrop-blur-md";
-
   return (
-    <div className="relative z-10 flex items-center justify-between gap-2 px-0.5 pt-0.5" dir="ltr">
-      <div className="flex min-w-0 flex-1 justify-center gap-1.5" dir="rtl">
-        {Array.from({ length: segmentCount }).map((_, i) => (
-          <span key={i} className={segmentClass(isFilled(i))} aria-hidden />
-        ))}
-      </div>
-      <span className={closeClass} aria-hidden>
-        ✕
-      </span>
+    <div className="flex min-w-0 flex-1 gap-1.5" dir="rtl">
+      {Array.from({ length: segmentCount }).map((_, i) => (
+        <span key={i} className={segmentClass(isFilled(i))} aria-hidden />
+      ))}
     </div>
   );
-}
-
-function NeonBlob({ className }) {
-  return (
-    <div
-      className={`pointer-events-none absolute rounded-full blur-3xl opacity-75 ${className}`}
-      aria-hidden
-    />
-  );
-}
-
-/** נקודות זוהרות ירוק / ורוד (אופציה א׳) */
-function ValuesNeonDot({ className, tone, soft = false }) {
-  const size = soft ? "h-2 w-2 sm:h-2.5 sm:w-2.5" : "h-1.5 w-1.5";
-
-  const glow =
-    tone === "green"
-      ? soft
-        ? "bg-[radial-gradient(circle_at_35%_30%,rgba(167,243,208,0.75)_0%,rgba(52,211,153,0.5)_45%,rgba(20,83,45,0.35)_100%)] shadow-[0_0_6px_2px_rgba(110,231,183,0.2),0_0_14px_4px_rgba(16,185,129,0.08)] ring-1 ring-emerald-200/15"
-        : "bg-[#39ff14] shadow-[0_0_10px_3px_rgba(57,255,20,0.55),0_0_22px_6px_rgba(57,255,20,0.15)]"
-      : "bg-[#ff2bd6] shadow-[0_0_10px_3px_rgba(255,43,214,0.5),0_0_22px_6px_rgba(255,0,255,0.12)]";
-
-  return <div className={`pointer-events-none absolute rounded-full ${size} ${glow} ${className}`} aria-hidden />;
 }
 
 /** מחלקות לשקופית אופציה א׳ — רפרנס כהה־ניאון */
@@ -556,7 +655,7 @@ function ValuesSlidePanel({ compact, numClass, pillClass, slideIndex }) {
 /** כרטיס א׳ — רפרנס כהה־ניאון + דפדוף 1–4 */
 function ValuesCreative({ compact }) {
   const total = VALUES_SLIDE_COUNT;
-  const { index, direction, goNext, goPrev, onTouchStart, onTouchEnd } = useSlidePager(total);
+  const { index, direction, onTouchStart, onTouchEnd, onPagerClick } = useSlidePager(total);
   const grainOpacity = compact ? 0.52 : 0.58;
 
   const { numClass, pillClass } = getValuesNeonSlideStyles(compact);
@@ -566,8 +665,6 @@ function ValuesCreative({ compact }) {
       className="relative flex h-full min-h-0 flex-col overflow-hidden rounded-[1.35rem] bg-[#0a0318] p-3 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.07)] sm:p-4"
       dir="rtl"
       aria-label={`קריאייטיב א׳ — שקופית ${index + 1} מתוך ${total}`}
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
     >
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_0%,#1f0a2e_0%,#0d0514_42%,#020005_100%)]"
@@ -583,21 +680,13 @@ function ValuesCreative({ compact }) {
         className="pointer-events-none absolute -right-[18%] top-[18%] h-[min(78%,26rem)] w-[min(72%,14rem)] rounded-full bg-gradient-to-bl from-[#00ff99]/25 via-[#7c3aed]/22 to-[#ff00ff]/12 blur-3xl"
         aria-hidden
       />
-      <NeonBlob className="-left-24 top-0 h-48 w-48 bg-[#6d28d9]/25 blur-[48px]" />
 
-      <ValuesNeonDot className="left-[12%] top-[13%]" tone="green" soft />
-      <ValuesNeonDot className="right-[8%] top-[32%]" tone="pink" />
-      <ValuesNeonDot className="left-[22%] bottom-[26%]" tone="pink" />
-      <ValuesNeonDot className="right-[20%] top-[48%] h-1 w-1" tone="green" />
-
-      <div
-        className="pointer-events-none absolute bottom-5 left-5 h-9 w-9 rotate-[-8deg] rounded-xl bg-gradient-to-br from-[#00ff99] to-[#ff00ff] opacity-95 shadow-[0_12px_40px_rgba(255,0,255,0.28),0_0_24px_rgba(0,255,153,0.2)]"
-        aria-hidden
-      />
-
-      <ValuesWrappedTopBar compact={compact} index={index} total={total} />
+      <CreativeTopHeader theme="neon">
+        <ValuesWrappedTopBar compact={compact} index={index} total={total} />
+      </CreativeTopHeader>
 
       <div className="relative z-[15] flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden py-1 sm:py-2">
+        <StoryTapZones onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} onPagerClick={onPagerClick} />
         <AnimatePresence mode="wait" custom={direction} initial={false}>
           <motion.div
             key={index}
@@ -607,21 +696,15 @@ function ValuesCreative({ compact }) {
             animate="center"
             exit="exit"
             transition={rtlSlideTransition}
-            className="flex w-full flex-col items-center justify-center"
+            className="pointer-events-none flex w-full flex-col items-center justify-center"
           >
             <ValuesNeonSlidePanel compact={compact} numClass={numClass} pillClass={pillClass} slideIndex={index} />
           </motion.div>
         </AnimatePresence>
       </div>
 
-      <CreativeBottomBar
-        theme="neon"
-        index={index}
-        total={total}
-        goNext={goNext}
-        goPrev={goPrev}
-        counterClassName="text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
-      />
+      <CreativeShareButton theme="neon" className={SHARE_BTN_POSITION} />
+      <CreativeBottomFooter theme="neon" />
     </div>
   );
 }
@@ -629,7 +712,7 @@ function ValuesCreative({ compact }) {
 /** כרטיס ב׳ — ארבעה רקעים + סרגל ברים + ניווט */
 function ProfileCreative({ compact }) {
   const total = OPTION_B_BACKGROUNDS.length;
-  const { index, direction, goNext, goPrev, onTouchStart, onTouchEnd } = useSlidePager(total);
+  const { index, direction, onTouchStart, onTouchEnd, onPagerClick } = useSlidePager(total);
 
   const src = OPTION_B_BACKGROUNDS[index].src;
 
@@ -638,8 +721,6 @@ function ProfileCreative({ compact }) {
       className="relative flex h-full min-h-0 w-full flex-col gap-2 overflow-hidden rounded-[1.35rem] bg-[#141414] p-3 shadow-[0_0_0_1px_rgba(255,255,255,0.1)] sm:gap-2.5 sm:p-4"
       dir="rtl"
       aria-label="קריאייטיב ב׳ — ארבעה רקעים עם דפדוף"
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
     >
       <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.35rem] bg-[#141414]">
         <AnimatePresence custom={direction} initial={false}>
@@ -662,11 +743,12 @@ function ProfileCreative({ compact }) {
         </AnimatePresence>
       </div>
 
-      <div className="relative z-20">
+      <CreativeTopHeader theme="profile">
         <WrappedProgress index={index} total={total} compact={compact} />
-      </div>
+      </CreativeTopHeader>
 
       <div className="relative z-[15] flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden px-2 py-1 sm:px-4 sm:py-2">
+        <StoryTapZones onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} onPagerClick={onPagerClick} />
         <AnimatePresence mode="wait" custom={direction} initial={false}>
           <motion.div
             key={index}
@@ -676,21 +758,15 @@ function ProfileCreative({ compact }) {
             animate="center"
             exit="exit"
             transition={rtlSlideTransition}
-            className="flex w-full flex-col items-center justify-center"
+            className="pointer-events-none flex w-full flex-col items-center justify-center"
           >
             <WrappedSpotifyTopicArticle compact={compact} slideIndex={index} />
           </motion.div>
         </AnimatePresence>
       </div>
 
-      <CreativeBottomBar
-        theme="profile"
-        index={index}
-        total={total}
-        goNext={goNext}
-        goPrev={goPrev}
-        counterClassName="text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
-      />
+      <CreativeShareButton theme="profile" className={SHARE_BTN_POSITION} />
+      <CreativeBottomFooter theme="profile" />
     </div>
   );
 }
@@ -698,7 +774,7 @@ function ProfileCreative({ compact }) {
 /** כרטיס ג׳ — רקע Year in Review + דפדוף 1–4 (כמו א׳/ב׳) */
 function MapCreative({ compact }) {
   const total = MAP_SLIDE_COUNT;
-  const { index, direction, goNext, goPrev, onTouchStart, onTouchEnd } = useSlidePager(total);
+  const { index, direction, onTouchStart, onTouchEnd, onPagerClick } = useSlidePager(total);
 
   const { numClass, pillClass } = getWrappedTopicSlideStyles(compact);
 
@@ -707,8 +783,6 @@ function MapCreative({ compact }) {
       className="relative flex h-full min-h-0 w-full flex-col gap-2 overflow-hidden rounded-[1.35rem] p-3 shadow-[0_0_0_1px_rgba(125,211,252,0.35)] sm:gap-2.5 sm:p-4"
       dir="rtl"
       aria-label={`קריאייטיב ג׳ — שקופית ${index + 1} מתוך ${total}`}
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
     >
       <div
         className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.35rem]"
@@ -759,11 +833,12 @@ function MapCreative({ compact }) {
       <DuoSparkle className="absolute left-[28%] bottom-[30%] z-[5] h-2 w-2 opacity-70 sm:bottom-[28%]" />
       <DuoSparkle className="absolute right-[30%] bottom-[22%] z-[5] h-2.5 w-2.5 opacity-85" />
 
-      <div className="relative z-20">
+      <CreativeTopHeader theme="duo">
         <StoryProgressBar theme="duo" compact={compact} index={index} total={total} />
-      </div>
+      </CreativeTopHeader>
 
-      <div className="relative z-[15] pointer-events-none flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden py-1 sm:py-2">
+      <div className="relative z-[15] flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden py-1 sm:py-2">
+        <StoryTapZones onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} onPagerClick={onPagerClick} />
         <AnimatePresence mode="wait" custom={direction} initial={false}>
           <motion.div
             key={index}
@@ -773,21 +848,15 @@ function MapCreative({ compact }) {
             animate="center"
             exit="exit"
             transition={rtlSlideTransition}
-            className="flex w-full flex-col items-center justify-center"
+            className="pointer-events-none flex w-full flex-col items-center justify-center"
           >
             <ValuesSlidePanel compact={compact} numClass={numClass} pillClass={pillClass} slideIndex={index} />
           </motion.div>
         </AnimatePresence>
       </div>
 
-      <CreativeBottomBar
-        theme="duo"
-        index={index}
-        total={total}
-        goNext={goNext}
-        goPrev={goPrev}
-        counterClassName="text-slate-800"
-      />
+      <CreativeShareButton theme="duo" className={SHARE_BTN_POSITION} />
+      <CreativeBottomFooter theme="duo" />
     </div>
   );
 }
