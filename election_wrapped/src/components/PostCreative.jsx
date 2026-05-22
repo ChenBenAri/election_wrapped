@@ -109,12 +109,12 @@ function TopicsHeadline({ compact }) {
 function getListLineClass(compact, enlarged = false, topicsSlide = false) {
   const size = enlarged
     ? compact
-      ? "text-[1.25rem] sm:text-[1.4375rem]"
-      : "text-[1.375rem] sm:text-[1.5625rem]"
+      ? "text-[1.1875rem] sm:text-[1.3125rem]"
+      : "text-[1.3125rem] sm:text-[1.4375rem]"
     : topicsSlide
       ? compact
-        ? "text-[1.3125rem] sm:text-[1.4375rem]"
-        : "text-[1.4375rem] sm:text-[1.5625rem]"
+        ? "text-[1.25rem] sm:text-[1.375rem]"
+        : "text-[1.375rem] sm:text-[1.5rem]"
       : compact
         ? "text-[0.8125rem] sm:text-[0.9375rem]"
         : "text-sm sm:text-base";
