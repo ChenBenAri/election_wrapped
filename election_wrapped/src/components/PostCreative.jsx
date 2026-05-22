@@ -13,7 +13,12 @@ const OPTION_B_BACKGROUNDS = [
   { id: "b-red", src: "/option-b-bg-4.png" },
 ];
 
-/** שקופית 1 (ובשאר השקופיות מלבד 2) */
+/** שקופית 1 — כותרת עליונה + 3 נושאים */
+const FIRST_SLIDE_IDENTITY_LINE = "תעודת הזהות הפוליטית שלי";
+const FIRST_SLIDE_IDENTITY_PARTS = {
+  title: "תעודת הזהות",
+  subtitle: "הפוליטית שלי",
+};
 const DEFAULT_SLIDE_HEADLINE = "3 הנושאים שחשובים לך בבחירות הקרובות:";
 const DEFAULT_SLIDE_LINES = [
   "שוק חופשי ומינימום התערבות ממשלתית",
@@ -48,6 +53,140 @@ function getSlideCopy(slideIndex) {
     return { headline: COALITION_SLIDE_HEADLINE, lines: COALITION_SLIDE_LINES };
   }
   return { headline: DEFAULT_SLIDE_HEADLINE, lines: DEFAULT_SLIDE_LINES };
+}
+
+const FIRST_SLIDE_IDENTITY_THEMES = {
+  neon: {
+    frame:
+      "rounded-2xl border border-[#94fbab]/30 bg-black/35 px-4 py-2.5 shadow-[0_0_28px_rgba(148,251,171,0.18),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm sm:px-5 sm:py-3",
+    title:
+      "bg-gradient-to-l from-[#94fbab] via-[#6ee7b7] to-[#5eead4] bg-clip-text text-transparent drop-shadow-[0_0_14px_rgba(148,251,171,0.45)]",
+    subtitle: "text-[#c8ffe0]/90",
+    divider: "bg-gradient-to-r from-transparent via-[#94fbab]/55 to-transparent",
+    dot: "bg-[#94fbab]/70 shadow-[0_0_8px_rgba(148,251,171,0.6)]",
+  },
+  profile: {
+    frame:
+      "rounded-[1.35rem] border border-white/25 bg-white/12 px-4 py-2.5 shadow-[0_8px_28px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.22)] backdrop-blur-md sm:px-5 sm:py-3",
+    title: "text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]",
+    subtitle: "text-[#8fd4ff]",
+    divider: "bg-gradient-to-r from-transparent via-white/45 to-transparent",
+    dot: "bg-white/75 shadow-[0_0_6px_rgba(255,255,255,0.45)]",
+  },
+  light: {
+    frame:
+      "rounded-2xl border border-[#1877f2]/18 bg-white/92 px-4 py-2.5 shadow-[0_10px_28px_rgba(24,119,242,0.12),inset_0_1px_0_rgba(255,255,255,0.95)] sm:px-5 sm:py-3",
+    title: "text-[#1877f2]",
+    subtitle: "text-slate-500",
+    divider: "bg-gradient-to-r from-transparent via-[#1877f2]/35 to-transparent",
+    dot: "bg-[#1877f2]/55",
+  },
+};
+
+function FirstSlideIdentityLine({ theme, compact }) {
+  const styles = FIRST_SLIDE_IDENTITY_THEMES[theme];
+  if (!styles) return null;
+
+  const titleSize = compact
+    ? "text-[1.3125rem] leading-none sm:text-[1.5rem]"
+    : "text-[1.4375rem] leading-none sm:text-[1.625rem]";
+  const subtitleSize = compact
+    ? "text-[0.6875rem] leading-none tracking-[0.14em] sm:text-[0.75rem]"
+    : "text-[0.75rem] leading-none tracking-[0.16em] sm:text-[0.8125rem]";
+
+  return (
+    <div className="relative z-20 flex w-full shrink-0 justify-center px-2 pb-0.5 pt-12 sm:px-3 sm:pb-1 sm:pt-14">
+      <div
+        className={`flex max-w-[min(100%,22rem)] flex-col items-center gap-1.5 sm:gap-2 ${styles.frame}`}
+        aria-label={FIRST_SLIDE_IDENTITY_LINE}
+      >
+        <div className="flex w-full items-center justify-center gap-2 sm:gap-2.5">
+          <span className={`h-px w-6 shrink-0 sm:w-8 ${styles.divider}`} aria-hidden />
+          <span className={`font-black tracking-[-0.022em] ${titleSize} ${styles.title}`}>
+            {FIRST_SLIDE_IDENTITY_PARTS.title}
+          </span>
+          <span className={`h-px w-6 shrink-0 sm:w-8 ${styles.divider}`} aria-hidden />
+        </div>
+
+        <div className="flex items-center gap-1.5">
+          <span className={`h-1 w-1 shrink-0 rounded-full ${styles.dot}`} aria-hidden />
+          <span className={`font-bold uppercase ${subtitleSize} ${styles.subtitle}`}>
+            {FIRST_SLIDE_IDENTITY_PARTS.subtitle}
+          </span>
+          <span className={`h-1 w-1 shrink-0 rounded-full ${styles.dot}`} aria-hidden />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function getTopicsHeadlineClass(theme, compact) {
+  const layout = compact
+    ? "w-full px-0.5 text-center font-black leading-none tracking-[-0.035em] whitespace-nowrap"
+    : "max-w-none text-center font-black leading-[1.12] tracking-[-0.026em] whitespace-nowrap";
+  const size = compact ? "text-[1.125rem] sm:text-[1.3rem]" : "text-[1.5rem] sm:text-[1.75rem]";
+
+  const emphasis = {
+    neon: "text-white drop-shadow-[0_0_20px_rgba(148,251,171,0.45)]",
+    profile: "text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]",
+    light: "text-[#0f4c9a] drop-shadow-[0_1px_0_rgba(255,255,255,0.85)]",
+  };
+
+  return `${layout} ${size} ${emphasis[theme]} -mt-1`;
+}
+
+function getListLineClass(compact, theme, enlarged = false) {
+  const color = theme === "profile" ? "text-white/95" : theme === "neon" ? "text-white" : "text-slate-900";
+  const weight = theme === "profile" ? "font-black" : "font-bold";
+  const flex = theme === "profile" ? "" : "min-w-0 flex-1";
+  const size = enlarged
+    ? compact
+      ? "text-[1.125rem] sm:text-[1.3125rem]"
+      : "text-[1.25rem] sm:text-[1.4375rem]"
+    : compact
+      ? "text-[0.8125rem] sm:text-[0.9375rem]"
+      : "text-sm sm:text-base";
+
+  return `${flex} text-right leading-none tracking-[-0.04em] whitespace-nowrap ${size} ${weight} ${color}`;
+}
+
+function getContentSlideHeadlineClass(theme, compact) {
+  const layout = "text-balance text-center font-black leading-[1.1] tracking-[-0.022em]";
+  const size = compact ? "text-[1.3125rem] sm:text-[1.5rem]" : "text-[1.5rem] sm:text-[1.8125rem]";
+  const maxW = compact ? "max-w-[20rem]" : "max-w-[22rem]";
+
+  const emphasis = {
+    neon: "text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]",
+    profile: "text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)]",
+    light: "text-slate-900",
+  };
+
+  return `${maxW} ${layout} ${size} ${emphasis[theme]}`;
+}
+
+function getSlideNumClass(theme, compact, enlarged = false) {
+  if (theme === "profile") {
+    return enlarged
+      ? compact
+        ? "shrink-0 text-[2.75rem] font-black tabular-nums leading-none tracking-[-0.06em] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] sm:text-[3.125rem]"
+        : "shrink-0 text-[3.125rem] font-black tabular-nums leading-none tracking-[-0.06em] text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.55)] sm:text-[3.5rem]"
+      : compact
+        ? "shrink-0 text-[2.125rem] font-black tabular-nums leading-none tracking-[-0.06em] text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] sm:text-[2.375rem]"
+        : "shrink-0 text-[2.5rem] font-black tabular-nums leading-none tracking-[-0.06em] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] sm:text-[2.75rem]";
+  }
+
+  const gradient =
+    theme === "neon"
+      ? "bg-gradient-to-b from-pink-300 to-white bg-clip-text text-transparent"
+      : "bg-gradient-to-b from-blue-700 via-blue-600 to-slate-400 bg-clip-text text-transparent sm:from-blue-800 sm:via-blue-600 sm:to-sky-400";
+
+  return enlarged
+    ? compact
+      ? `shrink-0 ${gradient} text-[2.5rem] font-black tabular-nums leading-none sm:text-[3rem]`
+      : `shrink-0 ${gradient} text-[3rem] font-black tabular-nums leading-none sm:text-[3.5rem]`
+    : compact
+      ? `shrink-0 ${gradient} text-[1.9rem] font-black tabular-nums leading-none sm:text-[2.3rem]`
+      : `shrink-0 ${gradient} text-[2.3rem] font-black tabular-nums leading-none sm:text-[2.75rem]`;
 }
 
 const POLITICAL_MAP_THEMES = {
@@ -93,9 +232,9 @@ function PoliticalAxisRow({ label, dotSide, dotLeft: dotLeftOverride, theme, com
 
   return (
     <li className="w-full">
-      <div className={`relative w-full ${compact ? "h-9" : "h-10"}`} dir="ltr">
+      <div className={`relative w-full ${compact ? "h-11" : "h-12"}`} dir="ltr">
         <span
-          className={`pointer-events-none absolute bottom-[calc(50%+10px)] -translate-x-1/2 whitespace-nowrap text-[0.68rem] font-black leading-none sm:text-xs ${t.label}`}
+          className={`pointer-events-none absolute bottom-[calc(50%+12px)] -translate-x-1/2 whitespace-nowrap text-[0.9375rem] font-black leading-none sm:text-[1.0625rem] ${t.label}`}
           style={{ left: dotLeft }}
         >
           {label}
@@ -115,15 +254,12 @@ function PoliticalAxisRow({ label, dotSide, dotLeft: dotLeftOverride, theme, com
 
 /** שקופית 3 — מפה פוליטית עם צירים מצוירים */
 function PoliticalMapSlidePanel({ theme, compact }) {
-  const t = POLITICAL_MAP_THEMES[theme];
-  const headlineClass = compact
-    ? `max-w-[19.5rem] text-balance text-center text-[0.95rem] font-black leading-[1.22] tracking-[-0.018em] sm:text-[1.05rem] ${t.headline}`
-    : `max-w-[21rem] text-balance text-center text-[1.05rem] font-black leading-[1.2] tracking-[-0.018em] sm:text-[1.2rem] ${t.headline}`;
+  const headlineClass = getContentSlideHeadlineClass(theme === "spotify" ? "profile" : theme, compact);
 
   const inner = (
-    <div className="pointer-events-none flex w-full flex-col items-center justify-center gap-2 px-2 sm:gap-2.5">
+    <div className="pointer-events-none flex w-full flex-col items-center justify-center gap-2.5 px-2 sm:gap-3">
       <h2 className={headlineClass}>{POLITICAL_MAP_HEADLINE}</h2>
-      <ul className={`mt-1 w-full space-y-3 sm:mt-1.5 sm:space-y-3.5 ${compact ? "max-w-[17.5rem]" : "max-w-[19rem]"}`}>
+      <ul className={`mt-1 w-full space-y-3.5 sm:mt-1.5 sm:space-y-4 ${compact ? "max-w-[19rem]" : "max-w-[21rem]"}`}>
         {POLITICAL_MAP_AXES.map((axis) => (
           <PoliticalAxisRow
             key={axis.id}
@@ -303,7 +439,7 @@ const FOOTER_DISCLAIMER_THEMES = {
   neon: { text: "text-white/55", wrap: "" },
   profile: {
     text: "text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]",
-    wrap: "mx-auto max-w-[94%] rounded-lg bg-black/60 px-3 py-2 ring-1 ring-white/20 shadow-[0_4px_18px_rgba(0,0,0,0.45)] backdrop-blur-md",
+    wrap: "",
   },
   duo: { text: "text-slate-600/85", wrap: "" },
 };
@@ -431,27 +567,27 @@ function WrappedSpotifyTopicArticle({ compact, slideIndex }) {
 
   const { headline, lines } = getSlideCopy(slideIndex);
   const articleClass = compact
-    ? "relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0a0a0a]/88 px-3 py-5 shadow-[0_12px_36px_rgba(0,0,0,0.5)] backdrop-blur-[2px] sm:px-4 sm:py-6"
-    : "relative overflow-hidden rounded-[1.35rem] border border-white/[0.09] bg-[#0a0a0a]/85 px-4 py-6 shadow-[0_16px_44px_rgba(0,0,0,0.48)] backdrop-blur-[2px] sm:px-5 sm:py-8";
+    ? "relative px-3 py-5 sm:px-4 sm:py-6"
+    : "relative px-4 py-6 sm:px-5 sm:py-8";
 
-  const stripClass =
-    "pointer-events-none absolute bottom-10 right-1 top-14 w-[3px] rounded-full bg-gradient-to-b from-white/20 via-indigo-200/35 to-white/10 sm:right-2";
-
-  const numClass = compact
-    ? "shrink-0 text-3xl font-black tabular-nums leading-none tracking-[-0.06em] text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] sm:text-[2rem]"
-    : "shrink-0 text-4xl font-black tabular-nums leading-none tracking-[-0.06em] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] sm:text-[2.35rem]";
+  const isTopicsSlide = slideIndex === 0;
+  const numClass = getSlideNumClass("profile", compact, !isTopicsSlide);
 
   return (
-    <div className="pointer-events-none w-full max-w-[min(100%,26rem)] select-none sm:max-w-[28rem]">
-      <article className={articleClass}>
-        <div className={stripClass} aria-hidden />
-
-        <p className="relative z-[1] flex justify-center pe-2 ps-3 sm:pe-3 sm:ps-4">
+    <div className="pointer-events-none mx-auto w-full max-w-[min(100%,26rem)] select-none sm:max-w-[28rem]">
+      <article className={`${articleClass} ${isTopicsSlide ? "flex w-full flex-col items-center" : ""}`}>
+        <p
+          className={
+            isTopicsSlide
+              ? "relative z-[1] flex w-full justify-end px-2 pe-4 sm:px-3 sm:pe-5"
+              : "relative z-[1] flex justify-center pe-2 ps-3 sm:pe-3 sm:ps-4"
+          }
+        >
           <span
             className={
-              compact
-                ? "inline-block max-w-full rounded-[1px] bg-[#ececec] px-2 py-[0.35rem] text-center text-sm font-black leading-[1.12] tracking-[-0.055em] text-neutral-950 sm:px-2.5 sm:py-1.5 sm:text-base"
-                : "inline-block max-w-full rounded-[2px] bg-[#ebebeb] px-2.5 py-1.5 text-center text-base font-black leading-[1.08] tracking-[-0.055em] text-neutral-950 sm:px-3 sm:py-2 sm:text-lg"
+              isTopicsSlide
+                ? `${getTopicsHeadlineClass("profile", compact).replace("text-center", "text-right")} block max-w-full`
+                : getContentSlideHeadlineClass("profile", compact)
             }
           >
             {headline}
@@ -462,23 +598,23 @@ function WrappedSpotifyTopicArticle({ compact, slideIndex }) {
           dir="rtl"
           className={
             compact
-              ? "relative z-[1] mt-4 list-none space-y-3.5 ps-3 pe-2 sm:mt-5 sm:space-y-4 sm:ps-4 sm:pe-3"
-              : "relative z-[1] mt-5 list-none space-y-4 ps-4 pe-3 sm:mt-6 sm:space-y-5 sm:ps-5 sm:pe-4"
+              ? `relative z-[1] mt-4 list-none space-y-3.5 sm:mt-5 sm:space-y-4 ${
+                  isTopicsSlide
+                    ? "translate-x-[-0.375rem] ps-2 pe-4 sm:translate-x-[-0.5rem] sm:ps-3 sm:pe-5"
+                    : "ps-3 pe-2 sm:ps-4 sm:pe-3"
+                }`
+              : `relative z-[1] mt-5 list-none space-y-4 sm:mt-6 sm:space-y-5 ${
+                  isTopicsSlide
+                    ? "translate-x-[-0.375rem] ps-3 pe-5 sm:translate-x-[-0.5rem] sm:ps-4 sm:pe-6"
+                    : "ps-4 pe-3 sm:ps-5 sm:pe-4"
+                }`
           }
         >
           {lines.map((line, i) => (
             <li key={line} className="flex w-full justify-start">
-              <div className="flex max-w-full items-baseline gap-2.5 sm:gap-3">
+              <div className="flex min-w-0 max-w-full items-baseline gap-2.5 sm:gap-3">
                 <span className={numClass}>{i + 1}</span>
-                <span
-                  className={
-                    compact
-                      ? "max-w-[min(100%,16.5rem)] rounded-[1px] bg-[#ececec] px-1.5 py-[0.2rem] text-right text-xs font-black leading-snug tracking-[-0.05em] text-neutral-950 sm:max-w-[18.5rem] sm:px-2 sm:py-1 sm:text-sm sm:leading-normal"
-                      : "max-w-[min(100%,19.5rem)] rounded-[2px] bg-[#ebebeb] px-2 py-1 text-right text-sm font-black leading-snug tracking-[-0.05em] text-neutral-950 sm:max-w-[21rem] sm:px-2.5 sm:py-1.5 sm:text-base sm:leading-normal"
-                  }
-                >
-                  {line}
-                </span>
+                <span className={getListLineClass(compact, "profile", !isTopicsSlide)}>{line}</span>
               </div>
             </li>
           ))}
@@ -559,43 +695,44 @@ function StoryProgressBar({ theme, compact, index, total }) {
 /** מחלקות לשקופית אופציה א׳ — רפרנס כהה־ניאון */
 function getValuesNeonSlideStyles(compact) {
   return {
-    numClass: compact
-      ? "shrink-0 bg-gradient-to-b from-pink-300 to-white bg-clip-text text-[1.65rem] font-black tabular-nums leading-none text-transparent sm:text-[2rem]"
-      : "shrink-0 bg-gradient-to-b from-pink-300 to-white bg-clip-text text-[2rem] font-black tabular-nums leading-none text-transparent sm:text-[2.4rem]",
     pillClass: compact
-      ? "flex w-full items-center gap-3 rounded-full border border-white/12 bg-black/50 px-3.5 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-md sm:px-4 sm:py-3"
-      : "flex w-full items-center gap-3.5 rounded-full border border-white/14 bg-black/45 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] backdrop-blur-md sm:px-5 sm:py-3.5",
+      ? "flex w-full min-w-0 items-center gap-3 px-1 py-1 sm:px-1.5 sm:py-1.5"
+      : "flex w-full min-w-0 items-center gap-3.5 px-1.5 py-1.5 sm:px-2 sm:py-2",
   };
 }
 
 /** תוכן שקופית אופציה א׳ — סקירת ערכים (רפרנס) */
-function ValuesNeonSlidePanel({ compact, numClass, pillClass, slideIndex }) {
+function ValuesNeonSlidePanel({ compact, pillClass, slideIndex }) {
   if (slideIndex === 2) {
     return <PoliticalMapSlidePanel theme="neon" compact={compact} />;
   }
 
   const { headline, lines } = getSlideCopy(slideIndex);
+  const isTopicsSlide = slideIndex === 0;
+  const numClass = getSlideNumClass("neon", compact, !isTopicsSlide);
 
   return (
     <div className="pointer-events-none flex w-full flex-col items-center justify-center gap-1.5 px-2 sm:gap-2">
       <h2
         className={
-          compact
-            ? "max-w-[19.5rem] text-balance text-center text-[0.95rem] font-black leading-[1.22] tracking-[-0.018em] text-white sm:text-[1.05rem]"
-            : "max-w-[21rem] text-balance text-center text-[1.05rem] font-black leading-[1.2] tracking-[-0.018em] text-white sm:text-[1.2rem]"
+          isTopicsSlide ? getTopicsHeadlineClass("neon", compact) : getContentSlideHeadlineClass("neon", compact)
         }
       >
         {headline}
       </h2>
 
-      <ul className="mt-2 w-full max-w-[18.5rem] space-y-2 sm:mt-2.5 sm:max-w-[20.5rem] sm:space-y-2.5">
+      <ul
+        className={`w-full space-y-2 sm:space-y-2.5 ${
+          isTopicsSlide
+            ? "mt-2 max-w-[18.5rem] sm:mt-2.5 sm:max-w-[20.5rem]"
+            : "mt-3 max-w-[20rem] sm:mt-3.5 sm:max-w-[22rem]"
+        }`}
+      >
         {lines.map((line, idx) => (
           <li key={line} className="flex justify-center">
             <div className={pillClass}>
               <span className={numClass}>{idx + 1}</span>
-              <p className="min-w-0 flex-1 text-right text-[0.8125rem] font-bold leading-snug tracking-[-0.01em] text-white sm:text-[0.9375rem]">
-                {line}
-              </p>
+              <p className={getListLineClass(compact, "neon", !isTopicsSlide)}>{line}</p>
             </div>
           </li>
         ))}
@@ -607,43 +744,44 @@ function ValuesNeonSlidePanel({ compact, numClass, pillClass, slideIndex }) {
 /** מחלקות לכותרת + רשימת נושאים (אופציות א׳ ו־ג׳) */
 function getWrappedTopicSlideStyles(compact) {
   return {
-    numClass: compact
-      ? "shrink-0 bg-gradient-to-b from-blue-700 via-blue-600 to-slate-400 bg-clip-text text-[1.65rem] font-black tabular-nums leading-none text-transparent sm:text-[2rem]"
-      : "shrink-0 bg-gradient-to-b from-blue-800 via-blue-600 to-sky-400 bg-clip-text text-[2rem] font-black tabular-nums leading-none text-transparent sm:text-[2.4rem]",
     pillClass: compact
-      ? "flex w-full items-center gap-3 rounded-full border border-slate-200/70 bg-white/45 px-3.5 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] backdrop-blur-md sm:px-4 sm:py-3"
-      : "flex w-full items-center gap-3.5 rounded-full border border-slate-200/80 bg-white/50 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-md sm:px-5 sm:py-3.5",
+      ? "flex w-full min-w-0 items-center gap-3 px-1 py-1 sm:px-1.5 sm:py-1.5"
+      : "flex w-full min-w-0 items-center gap-3.5 px-1.5 py-1.5 sm:px-2 sm:py-2",
   };
 }
 
 /** תוכן שקופית בודדת — כותרת, תת־כותרת ורשימה (אופציות א׳ ו־ג׳) */
-function ValuesSlidePanel({ compact, numClass, pillClass, slideIndex }) {
+function ValuesSlidePanel({ compact, pillClass, slideIndex }) {
   if (slideIndex === 2) {
     return <PoliticalMapSlidePanel theme="light" compact={compact} />;
   }
 
   const { headline, lines } = getSlideCopy(slideIndex);
+  const isTopicsSlide = slideIndex === 0;
+  const numClass = getSlideNumClass("light", compact, !isTopicsSlide);
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-1.5 px-2 sm:gap-2">
       <h2
         className={
-          compact
-            ? "max-w-[19.5rem] text-balance text-center text-[0.95rem] font-black leading-[1.22] tracking-[-0.018em] text-slate-900 sm:text-[1.05rem]"
-            : "max-w-[21rem] text-balance text-center text-[1.05rem] font-black leading-[1.2] tracking-[-0.018em] text-slate-900 sm:text-[1.2rem]"
+          isTopicsSlide ? getTopicsHeadlineClass("light", compact) : getContentSlideHeadlineClass("light", compact)
         }
       >
         {headline}
       </h2>
 
-      <ul className="mt-2 w-full max-w-[18.5rem] space-y-2 sm:mt-2.5 sm:max-w-[20.5rem] sm:space-y-2.5">
+      <ul
+        className={`w-full space-y-2 sm:space-y-2.5 ${
+          isTopicsSlide
+            ? "mt-2 max-w-[18.5rem] sm:mt-2.5 sm:max-w-[20.5rem]"
+            : "mt-3 max-w-[20rem] sm:mt-3.5 sm:max-w-[22rem]"
+        }`}
+      >
         {lines.map((line, idx) => (
           <li key={line} className="flex justify-center">
             <div className={pillClass}>
               <span className={numClass}>{idx + 1}</span>
-              <p className="min-w-0 flex-1 text-right text-[0.8125rem] font-bold leading-snug tracking-[-0.01em] text-slate-900 sm:text-[0.9375rem]">
-                {line}
-              </p>
+              <p className={getListLineClass(compact, "light", !isTopicsSlide)}>{line}</p>
             </div>
           </li>
         ))}
@@ -658,7 +796,7 @@ function ValuesCreative({ compact }) {
   const { index, direction, onTouchStart, onTouchEnd, onPagerClick } = useSlidePager(total);
   const grainOpacity = compact ? 0.52 : 0.58;
 
-  const { numClass, pillClass } = getValuesNeonSlideStyles(compact);
+  const { pillClass } = getValuesNeonSlideStyles(compact);
 
   return (
     <div
@@ -685,6 +823,10 @@ function ValuesCreative({ compact }) {
         <ValuesWrappedTopBar compact={compact} index={index} total={total} />
       </CreativeTopHeader>
 
+      {index === 0 && (
+        <FirstSlideIdentityLine theme="neon" compact={compact} />
+      )}
+
       <div className="relative z-[15] flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden py-1 sm:py-2">
         <StoryTapZones onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} onPagerClick={onPagerClick} />
         <AnimatePresence mode="wait" custom={direction} initial={false}>
@@ -698,7 +840,7 @@ function ValuesCreative({ compact }) {
             transition={rtlSlideTransition}
             className="pointer-events-none flex w-full flex-col items-center justify-center"
           >
-            <ValuesNeonSlidePanel compact={compact} numClass={numClass} pillClass={pillClass} slideIndex={index} />
+            <ValuesNeonSlidePanel compact={compact} pillClass={pillClass} slideIndex={index} />
           </motion.div>
         </AnimatePresence>
       </div>
@@ -747,6 +889,10 @@ function ProfileCreative({ compact }) {
         <WrappedProgress index={index} total={total} compact={compact} />
       </CreativeTopHeader>
 
+      {index === 0 && (
+        <FirstSlideIdentityLine theme="profile" compact={compact} />
+      )}
+
       <div className="relative z-[15] flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden px-2 py-1 sm:px-4 sm:py-2">
         <StoryTapZones onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} onPagerClick={onPagerClick} />
         <AnimatePresence mode="wait" custom={direction} initial={false}>
@@ -776,7 +922,7 @@ function MapCreative({ compact }) {
   const total = MAP_SLIDE_COUNT;
   const { index, direction, onTouchStart, onTouchEnd, onPagerClick } = useSlidePager(total);
 
-  const { numClass, pillClass } = getWrappedTopicSlideStyles(compact);
+  const { pillClass } = getWrappedTopicSlideStyles(compact);
 
   return (
     <div
@@ -837,6 +983,10 @@ function MapCreative({ compact }) {
         <StoryProgressBar theme="duo" compact={compact} index={index} total={total} />
       </CreativeTopHeader>
 
+      {index === 0 && (
+        <FirstSlideIdentityLine theme="light" compact={compact} />
+      )}
+
       <div className="relative z-[15] flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden py-1 sm:py-2">
         <StoryTapZones onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} onPagerClick={onPagerClick} />
         <AnimatePresence mode="wait" custom={direction} initial={false}>
@@ -850,7 +1000,7 @@ function MapCreative({ compact }) {
             transition={rtlSlideTransition}
             className="pointer-events-none flex w-full flex-col items-center justify-center"
           >
-            <ValuesSlidePanel compact={compact} numClass={numClass} pillClass={pillClass} slideIndex={index} />
+            <ValuesSlidePanel compact={compact} pillClass={pillClass} slideIndex={index} />
           </motion.div>
         </AnimatePresence>
       </div>
