@@ -413,6 +413,7 @@ function getSlidePanelStyles(compact) {
 }
 
 const SLIDE_PANEL_OFFSET = "-translate-y-10 sm:-translate-y-10";
+const TOPICS_SLIDE_WEB_OFFSET = "-translate-y-10 sm:-translate-y-7";
 
 function MapSlidePanel({ compact, pillClass, slideIndex }) {
   if (slideIndex === 2) {
@@ -427,9 +428,11 @@ function MapSlidePanel({ compact, pillClass, slideIndex }) {
   const isTopicsSlide = slideIndex === 0;
   const numClass = getSlideNumClass(compact, !isTopicsSlide, isTopicsSlide);
 
+  const panelOffset = isTopicsSlide ? TOPICS_SLIDE_WEB_OFFSET : SLIDE_PANEL_OFFSET;
+
   return (
     <div
-      className={`flex w-full flex-col items-center justify-center gap-1.5 px-1 sm:gap-2 sm:px-2 ${SLIDE_PANEL_OFFSET}`}
+      className={`flex w-full flex-col items-center justify-center gap-1.5 px-1 sm:gap-2 sm:px-2 ${panelOffset}`}
     >
       {isTopicsSlide ? (
         <TopicsHeadline compact={compact} />
