@@ -376,10 +376,14 @@ function StoryProgressBar({ compact, index, total }) {
   );
 }
 
+/** כוכב בסגנון Gemini — צורה רשמית, צבע לבן דרך currentColor */
+const GEMINI_SPARKLE_PATH =
+  "M32.447 0c.68 0 1.273.465 1.439 1.125a38.904 38.904 0 001.999 5.905c2.152 5 5.105 9.376 8.854 13.125 3.751 3.75 8.126 6.703 13.125 8.855a38.98 38.98 0 005.906 1.999c.66.166 1.124.758 1.124 1.438 0 .68-.464 1.273-1.125 1.439a38.902 38.902 0 00-5.905 1.999c-5 2.152-9.375 5.105-13.125 8.854-3.749 3.751-6.702 8.126-8.854 13.125a38.973 38.973 0 00-2 5.906 1.485 1.485 0 01-1.438 1.124c-.68 0-1.272-.464-1.438-1.125a38.913 38.913 0 00-2-5.905c-2.151-5-5.103-9.375-8.854-13.125-3.75-3.749-8.125-6.702-13.125-8.854a38.973 38.973 0 00-5.905-2A1.485 1.485 0 010 32.448c0-.68.465-1.272 1.125-1.438a38.903 38.903 0 005.905-2c5-2.151 9.376-5.104 13.125-8.854 3.75-3.749 6.703-8.125 8.855-13.125a38.972 38.972 0 001.999-5.905A1.485 1.485 0 0132.447 0z";
+
 function DuoSparkle({ className }) {
   return (
-    <svg className={`pointer-events-none text-white/90 ${className}`} viewBox="0 0 14 14" fill="currentColor" aria-hidden>
-      <path d="M7 0l1.1 4.9L14 7l-5.9 2.1L7 14l-1.1-4.9L0 7l5.9-2.1L7 0z" />
+    <svg className={`pointer-events-none text-white/90 ${className}`} viewBox="0 0 65 65" fill="currentColor" aria-hidden>
+      <path d={GEMINI_SPARKLE_PATH} />
     </svg>
   );
 }
@@ -472,12 +476,12 @@ function MapCreative({ compact }) {
         </AnimatePresence>
       </div>
 
-      <DuoSparkle className="absolute left-[10%] top-[20%] z-[5] h-2.5 w-2.5 opacity-95 sm:h-3 sm:w-3" />
-      <DuoSparkle className="absolute right-[14%] top-[26%] z-[5] h-2 w-2 opacity-80 sm:right-[12%]" />
-      <DuoSparkle className="absolute left-[18%] top-[55%] z-[5] h-2 w-2 opacity-75" />
-      <DuoSparkle className="absolute right-[22%] top-[48%] z-[5] h-2.5 w-2.5 opacity-90" />
-      <DuoSparkle className="absolute left-[28%] bottom-[30%] z-[5] h-2 w-2 opacity-70 sm:bottom-[28%]" />
-      <DuoSparkle className="absolute right-[30%] bottom-[22%] z-[5] h-2.5 w-2.5 opacity-85" />
+      <DuoSparkle className="absolute left-[10%] top-[20%] z-[5] h-3.5 w-3.5 opacity-95 sm:h-4 sm:w-4" />
+      <DuoSparkle className="absolute right-[14%] top-[26%] z-[5] h-3 w-3 opacity-80 sm:right-[12%] sm:h-3.5 sm:w-3.5" />
+      <DuoSparkle className="absolute left-[18%] top-[55%] z-[5] h-3 w-3 opacity-75 sm:h-3.5 sm:w-3.5" />
+      <DuoSparkle className="absolute right-[22%] top-[48%] z-[5] h-3.5 w-3.5 opacity-90 sm:h-4 sm:w-4" />
+      <DuoSparkle className="absolute left-[28%] bottom-[30%] z-[5] h-3 w-3 opacity-70 sm:bottom-[28%] sm:h-3.5 sm:w-3.5" />
+      <DuoSparkle className="absolute right-[30%] bottom-[22%] z-[5] h-3.5 w-3.5 opacity-85 sm:h-4 sm:w-4" />
 
       <CreativeTopHeader>
         <StoryProgressBar compact={compact} index={index} total={SLIDE_COUNT} />
