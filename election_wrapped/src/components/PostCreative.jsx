@@ -478,8 +478,6 @@ function MapCreative({ compact }) {
 
       <DuoSparkle className="absolute left-[10%] top-[20%] z-[5] h-3.5 w-3.5 opacity-95 sm:h-4 sm:w-4" />
       <DuoSparkle className="absolute right-[14%] top-[26%] z-[5] h-3 w-3 opacity-80 sm:right-[12%] sm:h-3.5 sm:w-3.5" />
-      <DuoSparkle className="absolute left-[18%] top-[55%] z-[5] h-3 w-3 opacity-75 sm:h-3.5 sm:w-3.5" />
-      <DuoSparkle className="absolute right-[22%] top-[48%] z-[5] h-3.5 w-3.5 opacity-90 sm:h-4 sm:w-4" />
       <DuoSparkle className="absolute left-[28%] bottom-[30%] z-[5] h-3 w-3 opacity-70 sm:bottom-[28%] sm:h-3.5 sm:w-3.5" />
       <DuoSparkle className="absolute right-[30%] bottom-[22%] z-[5] h-3.5 w-3.5 opacity-85 sm:h-4 sm:w-4" />
 
