@@ -46,7 +46,7 @@ function getSlideCopy(slideIndex) {
 
 const FIRST_SLIDE_IDENTITY_STYLE = {
   frame:
-    "rounded-2xl border border-[#1877f2]/18 bg-white/92 px-4 py-2.5 shadow-[0_10px_28px_rgba(24,119,242,0.12),inset_0_1px_0_rgba(255,255,255,0.95)] sm:px-5 sm:py-3",
+    "rounded-2xl border border-[#1877f2]/18 bg-white/92 px-6 py-4 shadow-[0_10px_28px_rgba(24,119,242,0.12),inset_0_1px_0_rgba(255,255,255,0.95)] sm:px-8 sm:py-[1.125rem]",
   title: "text-[#1877f2]",
   subtitle: "text-slate-500",
   divider: "bg-gradient-to-r from-transparent via-[#1877f2]/35 to-transparent",
@@ -55,32 +55,32 @@ const FIRST_SLIDE_IDENTITY_STYLE = {
 
 function FirstSlideIdentityLine({ compact }) {
   const titleSize = compact
-    ? "text-[1.3125rem] leading-none sm:text-[1.5rem]"
-    : "text-[1.4375rem] leading-none sm:text-[1.625rem]";
+    ? "text-[1.6875rem] leading-none sm:text-[1.875rem]"
+    : "text-[2rem] leading-none sm:text-[2.125rem]";
   const subtitleSize = compact
-    ? "text-[0.6875rem] leading-none tracking-[0.14em] sm:text-[0.75rem]"
-    : "text-[0.75rem] leading-none tracking-[0.16em] sm:text-[0.8125rem]";
+    ? "text-[0.875rem] leading-none tracking-[0.14em] sm:text-[0.9375rem]"
+    : "text-[0.9375rem] leading-none tracking-[0.16em] sm:text-[1rem]";
 
   return (
     <div className="relative z-20 flex w-full shrink-0 justify-center px-2 pb-0.5 pt-16 sm:px-3 sm:pb-1 sm:pt-[4.75rem]">
       <div
-        className={`flex max-w-[min(100%,22rem)] flex-col items-center gap-1.5 sm:gap-2 ${FIRST_SLIDE_IDENTITY_STYLE.frame}`}
+        className={`flex max-w-[min(100%,28rem)] flex-col items-center gap-3 sm:gap-3.5 ${FIRST_SLIDE_IDENTITY_STYLE.frame}`}
         aria-label={FIRST_SLIDE_IDENTITY_LINE}
       >
-        <div className="flex w-full items-center justify-center gap-2 sm:gap-2.5">
-          <span className={`h-px w-6 shrink-0 sm:w-8 ${FIRST_SLIDE_IDENTITY_STYLE.divider}`} aria-hidden />
+        <div className="flex w-full items-center justify-center gap-3.5 sm:gap-4">
+          <span className={`h-px w-9 shrink-0 sm:w-11 ${FIRST_SLIDE_IDENTITY_STYLE.divider}`} aria-hidden />
           <span className={`font-black tracking-[-0.022em] ${titleSize} ${FIRST_SLIDE_IDENTITY_STYLE.title}`}>
             {FIRST_SLIDE_IDENTITY_PARTS.title}
           </span>
-          <span className={`h-px w-6 shrink-0 sm:w-8 ${FIRST_SLIDE_IDENTITY_STYLE.divider}`} aria-hidden />
+          <span className={`h-px w-9 shrink-0 sm:w-11 ${FIRST_SLIDE_IDENTITY_STYLE.divider}`} aria-hidden />
         </div>
 
-        <div className="flex items-center gap-1.5">
-          <span className={`h-1 w-1 shrink-0 rounded-full ${FIRST_SLIDE_IDENTITY_STYLE.dot}`} aria-hidden />
+        <div className="flex items-center gap-3">
+          <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${FIRST_SLIDE_IDENTITY_STYLE.dot}`} aria-hidden />
           <span className={`font-bold uppercase ${subtitleSize} ${FIRST_SLIDE_IDENTITY_STYLE.subtitle}`}>
             {FIRST_SLIDE_IDENTITY_PARTS.subtitle}
           </span>
-          <span className={`h-1 w-1 shrink-0 rounded-full ${FIRST_SLIDE_IDENTITY_STYLE.dot}`} aria-hidden />
+          <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${FIRST_SLIDE_IDENTITY_STYLE.dot}`} aria-hidden />
         </div>
       </div>
     </div>
