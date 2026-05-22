@@ -242,7 +242,7 @@ const rtlSlideTransition = { duration: 0.28, ease: [0.22, 1, 0.36, 1] };
 
 async function handleCreativeShare() {
   const url = window.location.href;
-  const payload = { title: "My Political ID", text: "הפרופיל הבחירותי שלי", url };
+  const payload = { url };
   try {
     if (navigator.share) {
       await navigator.share(payload);
