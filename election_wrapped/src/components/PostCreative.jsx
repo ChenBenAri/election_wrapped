@@ -119,15 +119,13 @@ function getListLineClass(compact, enlarged = false, topicsSlide = false) {
         ? "text-[0.8125rem] sm:text-[0.9375rem]"
         : "text-sm sm:text-base";
 
-  const weight = topicsSlide ? "font-normal" : "font-bold";
+  const weight = "font-normal";
 
-  return `min-w-0 flex-1 text-right leading-snug tracking-normal whitespace-nowrap ${size} ${weight} text-slate-900 ${
-    topicsSlide ? FLOWING_FONT : ""
-  }`;
+  return `min-w-0 flex-1 text-right leading-snug tracking-normal whitespace-nowrap ${size} ${weight} text-slate-900 ${FLOWING_FONT}`;
 }
 
 function getContentSlideHeadlineClass(compact) {
-  const layout = "text-balance text-center font-black leading-[1.1] tracking-[-0.022em]";
+  const layout = `text-balance text-center font-normal leading-[1.22] tracking-normal ${FLOWING_FONT}`;
   const size = compact ? "text-[1.3125rem] sm:text-[1.5rem]" : "text-[1.5rem] sm:text-[1.8125rem]";
   const maxW = compact ? "max-w-[20rem]" : "max-w-[22rem]";
 
@@ -146,8 +144,8 @@ function getSlideNumClass(compact, enlarged = false, topicsSlide = false) {
 
   return enlarged
     ? compact
-      ? `shrink-0 ${gradient} text-[2.5rem] font-black tabular-nums leading-none sm:text-[3rem]`
-      : `shrink-0 ${gradient} text-[3rem] font-black tabular-nums leading-none sm:text-[3.5rem]`
+      ? `shrink-0 ${gradient} ${FLOWING_FONT} text-[2.5rem] font-normal tabular-nums leading-none sm:text-[3rem]`
+      : `shrink-0 ${gradient} ${FLOWING_FONT} text-[3rem] font-normal tabular-nums leading-none sm:text-[3.5rem]`
     : compact
       ? `shrink-0 ${gradient} text-[1.9rem] font-black tabular-nums leading-none sm:text-[2.3rem]`
       : `shrink-0 ${gradient} text-[2.3rem] font-black tabular-nums leading-none sm:text-[2.75rem]`;
@@ -161,7 +159,7 @@ const POLITICAL_MAP_STYLE = {
 };
 
 function AxisEndLabel({ label }) {
-  const labelClass = `text-[0.8125rem] font-black leading-none sm:text-[0.9375rem] ${POLITICAL_MAP_STYLE.label}`;
+  const labelClass = `text-[0.8125rem] font-normal leading-none sm:text-[0.9375rem] ${POLITICAL_MAP_STYLE.label} ${FLOWING_FONT}`;
 
   if (Array.isArray(label)) {
     return (
