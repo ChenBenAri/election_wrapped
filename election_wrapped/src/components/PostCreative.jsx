@@ -13,7 +13,7 @@ const TOPICS_SLIDE_HEADLINE_PARTS = {
   line2: "בבחירות הקרובות:",
 };
 const DEFAULT_SLIDE_LINES = [
-  "שוק חופשי ומינימום התערבות ממשלתית",
+  "שוק חופשי עם מעט התערבות ממשלתית",
   "שאיפה להסדר מדיני ארוך טווח",
   "איכות מערכת החינוך",
 ];
@@ -92,7 +92,7 @@ const FLOWING_FONT = "font-flowing";
 
 function getTopicsHeadlineClass(compact) {
   const layout = `mx-auto max-w-[20rem] text-center font-normal leading-[1.22] tracking-normal sm:max-w-[22rem] ${FLOWING_FONT}`;
-  const size = compact ? "text-[1.5rem] sm:text-[1.75rem]" : "text-[1.75rem] sm:text-[2rem]";
+  const size = compact ? "text-[1.625rem] sm:text-[1.875rem]" : "text-[1.875rem] sm:text-[2.125rem]";
 
   return `${layout} ${size} ${HEADLINE_BLUE} -mt-1`;
 }
@@ -109,12 +109,12 @@ function TopicsHeadline({ compact }) {
 function getListLineClass(compact, enlarged = false, topicsSlide = false) {
   const size = enlarged
     ? compact
-      ? "text-[1.125rem] sm:text-[1.3125rem]"
-      : "text-[1.25rem] sm:text-[1.4375rem]"
+      ? "text-[1.25rem] sm:text-[1.4375rem]"
+      : "text-[1.375rem] sm:text-[1.5625rem]"
     : topicsSlide
       ? compact
-        ? "text-[1.1875rem] sm:text-[1.3125rem]"
-        : "text-[1.3125rem] sm:text-[1.4375rem]"
+        ? "text-[1.3125rem] sm:text-[1.4375rem]"
+        : "text-[1.4375rem] sm:text-[1.5625rem]"
       : compact
         ? "text-[0.8125rem] sm:text-[0.9375rem]"
         : "text-sm sm:text-base";
@@ -128,7 +128,7 @@ function getListLineClass(compact, enlarged = false, topicsSlide = false) {
 
 function getContentSlideHeadlineClass(compact) {
   const layout = `text-balance text-center font-normal leading-[1.22] tracking-normal ${FLOWING_FONT}`;
-  const size = compact ? "text-[1.3125rem] sm:text-[1.5rem]" : "text-[1.5rem] sm:text-[1.8125rem]";
+  const size = compact ? "text-[1.4375rem] sm:text-[1.625rem]" : "text-[1.625rem] sm:text-[1.9375rem]";
   const maxW = compact ? "max-w-[20rem]" : "max-w-[22rem]";
 
   return `${maxW} ${layout} ${size} ${HEADLINE_BLUE}`;
@@ -140,14 +140,14 @@ function getSlideNumClass(compact, enlarged = false, topicsSlide = false) {
 
   if (topicsSlide) {
     return compact
-      ? `shrink-0 ${gradient} ${FLOWING_FONT} text-[2.75rem] font-normal tabular-nums leading-none sm:text-[3rem]`
-      : `shrink-0 ${gradient} ${FLOWING_FONT} text-[3rem] font-normal tabular-nums leading-none sm:text-[3.375rem]`;
+      ? `shrink-0 ${gradient} ${FLOWING_FONT} text-[2.875rem] font-normal tabular-nums leading-none sm:text-[3.125rem]`
+      : `shrink-0 ${gradient} ${FLOWING_FONT} text-[3.125rem] font-normal tabular-nums leading-none sm:text-[3.5rem]`;
   }
 
   return enlarged
     ? compact
-      ? `shrink-0 ${gradient} ${FLOWING_FONT} text-[2.5rem] font-normal tabular-nums leading-none sm:text-[3rem]`
-      : `shrink-0 ${gradient} ${FLOWING_FONT} text-[3rem] font-normal tabular-nums leading-none sm:text-[3.5rem]`
+      ? `shrink-0 ${gradient} ${FLOWING_FONT} text-[2.625rem] font-normal tabular-nums leading-none sm:text-[3.125rem]`
+      : `shrink-0 ${gradient} ${FLOWING_FONT} text-[3.125rem] font-normal tabular-nums leading-none sm:text-[3.625rem]`
     : compact
       ? `shrink-0 ${gradient} text-[1.9rem] font-black tabular-nums leading-none sm:text-[2.3rem]`
       : `shrink-0 ${gradient} text-[2.3rem] font-black tabular-nums leading-none sm:text-[2.75rem]`;
