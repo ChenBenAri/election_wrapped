@@ -201,7 +201,7 @@ function PoliticalMapSlidePanel({ compact }) {
   return (
     <div className="pointer-events-none flex w-full flex-col items-center justify-center gap-2.5 px-1 sm:gap-3 sm:px-2">
       <h2 className={getContentSlideHeadlineClass(compact)}>{POLITICAL_MAP_HEADLINE}</h2>
-      <ul className={`mt-1 w-full space-y-3.5 sm:mt-1.5 sm:space-y-4 ${compact ? "max-w-[22.5rem]" : "max-w-[25rem]"}`}>
+      <ul className={`mt-4 w-full space-y-3.5 sm:mt-5 sm:space-y-4 ${compact ? "max-w-[22.5rem]" : "max-w-[25rem]"}`}>
         {POLITICAL_MAP_AXES.map((axis) => (
           <PoliticalAxisRow
             key={axis.id}
