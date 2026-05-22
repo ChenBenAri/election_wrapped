@@ -7,9 +7,9 @@ const FIRST_SLIDE_IDENTITY_PARTS = {
   title: "תעודת הזהות",
   subtitle: "הפוליטית שלי",
 };
-const DEFAULT_SLIDE_HEADLINE = "3 הנושאים שחשובים לך בבחירות הקרובות:";
+const DEFAULT_SLIDE_HEADLINE = "3 הנושאים שחשובים לי בבחירות הקרובות:";
 const TOPICS_SLIDE_HEADLINE_PARTS = {
-  line1: "3 הנושאים שחשובים לך",
+  line1: "3 הנושאים שחשובים לי",
   line2: "בבחירות הקרובות:",
 };
 const DEFAULT_SLIDE_LINES = [
@@ -21,10 +21,10 @@ const DEFAULT_SLIDE_LINES = [
 const CANDIDATES_SLIDE_HEADLINE = "התאמה למועמד באחוזים:";
 const CANDIDATES_SLIDE_LINES = ["יאיר לפיד - 85%", "יאיר גולן - 67%", "אביגדור ליברמן - 43%"];
 
-const COALITION_SLIDE_HEADLINE = "מי הקואלציה הטבעית שלך:";
+const COALITION_SLIDE_HEADLINE = "הקואלציה הטבעית שלי:";
 const COALITION_SLIDE_LINES = ["מרכז", "שמאל", "ערבים"];
 
-const POLITICAL_MAP_HEADLINE = "המפה הפוליטית שלך:";
+const POLITICAL_MAP_HEADLINE = "המפה הפוליטית שלי:";
 
 const POLITICAL_MAP_AXES = [
   { id: "economic", leftLabel: "סוציאל-דמוקרטי", rightLabel: "קפיטליסטי", dotLeft: "78%" },
@@ -120,8 +120,10 @@ function getListLineClass(compact, enlarged = false, topicsSlide = false) {
         : "text-sm sm:text-base";
 
   const weight = "font-normal";
+  const tracking = "tracking-normal";
+  const leading = "leading-snug";
 
-  return `min-w-0 flex-1 text-right leading-snug tracking-normal whitespace-nowrap ${size} ${weight} text-slate-900 ${FLOWING_FONT}`;
+  return `min-w-0 flex-1 text-right ${leading} ${tracking} whitespace-nowrap ${size} ${weight} text-slate-900 ${FLOWING_FONT}`;
 }
 
 function getContentSlideHeadlineClass(compact) {
