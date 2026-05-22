@@ -15,7 +15,7 @@ const DEFAULT_SLIDE_LINES = [
 ];
 
 const CANDIDATES_SLIDE_HEADLINE = "התאמה למועמד באחוזים:";
-const CANDIDATES_SLIDE_LINES = ["יאיר לפיד 85%", "יאיר גולן 67%", "אביגדור ליברמן 43%"];
+const CANDIDATES_SLIDE_LINES = ["יאיר לפיד - 85%", "יאיר גולן - 67%", "אביגדור ליברמן - 43%"];
 
 const COALITION_SLIDE_HEADLINE = "מי הקואלציה הטבעית שלך:";
 const COALITION_SLIDE_LINES = ["מרכז", "שמאל", "ערבים"];
