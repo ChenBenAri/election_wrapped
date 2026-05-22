@@ -8,6 +8,10 @@ const FIRST_SLIDE_IDENTITY_PARTS = {
   subtitle: "הפוליטית שלי",
 };
 const DEFAULT_SLIDE_HEADLINE = "3 הנושאים שחשובים לך בבחירות הקרובות:";
+const TOPICS_SLIDE_HEADLINE_PARTS = {
+  line1: "3 הנושאים שחשובים לך",
+  line2: "בבחירות הקרובות:",
+};
 const DEFAULT_SLIDE_LINES = [
   "שוק חופשי ומינימום התערבות ממשלתית",
   "שאיפה להסדר מדיני ארוך טווח",
@@ -84,14 +88,22 @@ function FirstSlideIdentityLine({ compact }) {
 }
 
 const HEADLINE_BLUE = "text-[#0f4c9a] drop-shadow-[0_1px_0_rgba(255,255,255,0.85)]";
+const FLOWING_FONT = "font-flowing";
 
 function getTopicsHeadlineClass(compact) {
-  const layout = compact
-    ? "w-full px-0.5 text-center font-black leading-none tracking-[-0.04em] whitespace-nowrap"
-    : "max-w-none text-center font-black leading-[1.08] tracking-[-0.032em] whitespace-nowrap";
-  const size = compact ? "text-[1.25rem] sm:text-[1.4375rem]" : "text-[1.625rem] sm:text-[1.875rem]";
+  const layout = `mx-auto max-w-[20rem] text-center font-normal leading-[1.22] tracking-normal sm:max-w-[22rem] ${FLOWING_FONT}`;
+  const size = compact ? "text-[1.5rem] sm:text-[1.75rem]" : "text-[1.75rem] sm:text-[2rem]";
 
   return `${layout} ${size} ${HEADLINE_BLUE} -mt-1`;
+}
+
+function TopicsHeadline({ compact }) {
+  return (
+    <h2 className={getTopicsHeadlineClass(compact)}>
+      <span className="block">{TOPICS_SLIDE_HEADLINE_PARTS.line1}</span>
+      <span className="block">{TOPICS_SLIDE_HEADLINE_PARTS.line2}</span>
+    </h2>
+  );
 }
 
 function getListLineClass(compact, enlarged = false, topicsSlide = false) {
@@ -101,13 +113,17 @@ function getListLineClass(compact, enlarged = false, topicsSlide = false) {
       : "text-[1.25rem] sm:text-[1.4375rem]"
     : topicsSlide
       ? compact
-        ? "text-[0.9375rem] sm:text-[1.0625rem]"
-        : "text-[1.0625rem] sm:text-[1.1875rem]"
+        ? "text-[1.1875rem] sm:text-[1.3125rem]"
+        : "text-[1.3125rem] sm:text-[1.4375rem]"
       : compact
         ? "text-[0.8125rem] sm:text-[0.9375rem]"
         : "text-sm sm:text-base";
 
-  return `min-w-0 flex-1 text-right leading-none tracking-[-0.045em] whitespace-nowrap ${size} font-bold text-slate-900`;
+  const weight = topicsSlide ? "font-normal" : "font-bold";
+
+  return `min-w-0 flex-1 text-right leading-snug tracking-normal whitespace-nowrap ${size} ${weight} text-slate-900 ${
+    topicsSlide ? FLOWING_FONT : ""
+  }`;
 }
 
 function getContentSlideHeadlineClass(compact) {
@@ -124,8 +140,8 @@ function getSlideNumClass(compact, enlarged = false, topicsSlide = false) {
 
   if (topicsSlide) {
     return compact
-      ? `shrink-0 ${gradient} text-[2.125rem] font-black tabular-nums leading-none sm:text-[2.5rem]`
-      : `shrink-0 ${gradient} text-[2.5rem] font-black tabular-nums leading-none sm:text-[2.875rem]`;
+      ? `shrink-0 ${gradient} ${FLOWING_FONT} text-[2.75rem] font-normal tabular-nums leading-none sm:text-[3rem]`
+      : `shrink-0 ${gradient} ${FLOWING_FONT} text-[3rem] font-normal tabular-nums leading-none sm:text-[3.375rem]`;
   }
 
   return enlarged
@@ -415,16 +431,18 @@ function MapSlidePanel({ compact, pillClass, slideIndex }) {
     <div
       className={`flex w-full flex-col items-center justify-center gap-1.5 px-1 sm:gap-2 sm:px-2 ${SLIDE_PANEL_OFFSET}`}
     >
-      <h2 className={isTopicsSlide ? getTopicsHeadlineClass(compact) : getContentSlideHeadlineClass(compact)}>
-        {headline}
-      </h2>
+      {isTopicsSlide ? (
+        <TopicsHeadline compact={compact} />
+      ) : (
+        <h2 className={getContentSlideHeadlineClass(compact)}>{headline}</h2>
+      )}
 
       <ul
-        className={`w-full space-y-2 sm:space-y-2.5 ${
+        className={
           isTopicsSlide
-            ? "mt-4 max-w-[min(100%,21.5rem)] sm:mt-4.5 sm:max-w-[23rem]"
-            : "mt-3 max-w-[20rem] sm:mt-3.5 sm:max-w-[22rem]"
-        }`}
+            ? "mt-4 w-full max-w-[min(100%,24rem)] space-y-3 sm:mt-5 sm:max-w-[26rem] sm:space-y-3.5"
+            : "mt-3 w-full max-w-[20rem] space-y-2 sm:mt-3.5 sm:max-w-[22rem] sm:space-y-2.5"
+        }
       >
         {lines.map((line, idx) => (
           <li key={line} className="flex justify-center">
