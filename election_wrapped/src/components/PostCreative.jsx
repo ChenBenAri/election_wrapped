@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 const FIRST_SLIDE_IDENTITY_LINE = "תעודת הזהות הפוליטית שלי";
@@ -6,10 +6,10 @@ const FIRST_SLIDE_IDENTITY_PARTS = {
   title: "תעודת הזהות",
   subtitle: "הפוליטית שלי",
 };
-const DEFAULT_SLIDE_HEADLINE = "מה הכי חשוב לי בבחירות הקרובות?";
+const DEFAULT_SLIDE_HEADLINE = "מה הכי חשוב לי בבחירות הקרובות";
 const TOPICS_SLIDE_HEADLINE_PARTS = {
   line1: "מה הכי חשוב לי",
-  line2: "בבחירות הקרובות?",
+  line2: "בבחירות הקרובות",
 };
 const DEFAULT_SLIDE_LINES = [
   "עמדה ביטחונית",
@@ -17,10 +17,10 @@ const DEFAULT_SLIDE_LINES = [
   "שילוב חרדים",
 ];
 
-const CANDIDATES_SLIDE_HEADLINE = "מי הכי מתאים לי?";
+const CANDIDATES_SLIDE_HEADLINE = "מי הכי מתאים לי";
 const CANDIDATES_SLIDE_LINES = ["יאיר לפיד - 85%", "יאיר גולן - 67%", "אביגדור ליברמן - 43%"];
 
-const POLITICAL_MAP_HEADLINE = "מה הדעות שלי?";
+const POLITICAL_MAP_HEADLINE = "מה הדעות שלי";
 const POLITICAL_SLIDE_LINES = ["בעד פתרון מדיני", "בעד כלכלה חופשית", "בעד גיוס חרדים"];
 
 const SLIDE_COUNT = 3;
@@ -195,7 +195,7 @@ function StoryTapZones({ onTouchStart, onTouchEnd, onPagerClick }) {
   return (
     <div
       data-story-pager
-      className="absolute inset-0 z-[25] touch-manipulation"
+      className="absolute inset-0 z-[10] touch-manipulation"
       dir="ltr"
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
@@ -294,6 +294,16 @@ const CONTENT_PANEL_CLASS = `flex w-full flex-col items-center justify-center ga
 
 function MapSlidePanel({ compact, slideIndex }) {
   const { headline, lines } = getSlideCopy(slideIndex);
+  const [revealedRows, setRevealedRows] = useState(() => new Set());
+
+  useEffect(() => {
+    setRevealedRows(new Set());
+  }, [slideIndex]);
+
+  const revealRow = useCallback((rowIndex, event) => {
+    event.stopPropagation();
+    setRevealedRows((prev) => new Set(prev).add(rowIndex));
+  }, []);
 
   return (
     <div className={CONTENT_PANEL_CLASS}>
@@ -303,12 +313,37 @@ function MapSlidePanel({ compact, slideIndex }) {
         <TopicsStyleHeadline compact={compact} line1={headline} nudgeDown />
       )}
 
-      <ul className={TOPICS_LAYOUT_LIST_CLASS}>
-        {lines.map((line, idx) => (
-          <li key={line} className="flex justify-center">
-            <TopicsListRow compact={compact} index={idx + 1} line={line} />
-          </li>
-        ))}
+      <ul className={`${TOPICS_LAYOUT_LIST_CLASS} relative z-[30] pointer-events-none`}>
+        {lines.map((line, idx) => {
+          const isRevealed = idx === 0 || revealedRows.has(idx);
+          const isInteractive = idx > 0 && !isRevealed;
+
+          return (
+            <li
+              key={line}
+              data-reveal-row={isInteractive ? "" : undefined}
+              className={`flex w-full justify-center ${isInteractive ? "relative z-[30] cursor-pointer touch-manipulation pointer-events-auto" : "pointer-events-none"}`}
+              onPointerUp={
+                isInteractive
+                  ? (event) => {
+                      event.stopPropagation();
+                      revealRow(idx, event);
+                    }
+                  : undefined
+              }
+              role={isInteractive ? "button" : undefined}
+              aria-label={isInteractive ? `חשיפת פריט ${idx + 1}` : undefined}
+            >
+              <div
+                className={`w-full transition-all duration-300 ${
+                  isRevealed ? "opacity-100 blur-0" : "opacity-50 blur-[6px] saturate-75"
+                }`}
+              >
+                <TopicsListRow compact={compact} index={idx + 1} line={line} />
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
@@ -367,7 +402,7 @@ function MapCreative({ compact }) {
             animate="center"
             exit="exit"
             transition={rtlSlideTransition}
-            className="pointer-events-none flex w-full flex-col items-center justify-center"
+            className="pointer-events-none relative z-[20] flex w-full flex-col items-center justify-center"
           >
             <MapSlidePanel compact={compact} slideIndex={index} />
           </motion.div>
