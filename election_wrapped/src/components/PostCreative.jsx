@@ -6,39 +6,31 @@ const FIRST_SLIDE_IDENTITY_PARTS = {
   title: "תעודת הזהות",
   subtitle: "הפוליטית שלי",
 };
-const DEFAULT_SLIDE_HEADLINE = "3 הנושאים שחשובים לי בבחירות הקרובות:";
+const DEFAULT_SLIDE_HEADLINE = "מה הכי חשוב לי בבחירות הקרובות?";
 const TOPICS_SLIDE_HEADLINE_PARTS = {
-  line1: "3 הנושאים שחשובים לי",
-  line2: "בבחירות הקרובות:",
+  line1: "מה הכי חשוב לי",
+  line2: "בבחירות הקרובות?",
 };
 const DEFAULT_SLIDE_LINES = [
-  "שוק חופשי עם מעט התערבות ממשלתית",
-  "שאיפה להסדר מדיני ארוך טווח",
-  "איכות מערכת החינוך",
+  "עמדה ביטחונית",
+  "גוש (ימין/מרכז/שמאל)",
+  "שילוב חרדים",
 ];
 
-const CANDIDATES_SLIDE_HEADLINE = "התאמה למועמד באחוזים:";
+const CANDIDATES_SLIDE_HEADLINE = "מי הכי מתאים לי?";
 const CANDIDATES_SLIDE_LINES = ["יאיר לפיד - 85%", "יאיר גולן - 67%", "אביגדור ליברמן - 43%"];
 
-const COALITION_SLIDE_HEADLINE = "הקואלציה הטבעית שלי:";
-const COALITION_SLIDE_LINES = ["מרכז", "שמאל", "ערבים"];
+const POLITICAL_MAP_HEADLINE = "מה הדעות שלי?";
+const POLITICAL_SLIDE_LINES = ["בעד פתרון מדיני", "בעד כלכלה חופשית", "בעד גיוס חרדים"];
 
-const POLITICAL_MAP_HEADLINE = "המפה הפוליטית שלי:";
-
-const POLITICAL_MAP_AXES = [
-  { id: "economic", leftLabel: "סוציאל-דמוקרטי", rightLabel: "קפיטליסטי", dotLeft: "78%" },
-  { id: "security", leftLabel: "מדיני", rightLabel: "ביטחוני", dotLeft: "24%" },
-  { id: "social", leftLabel: "ליברלי", rightLabel: "שמרני", dotLeft: "9%" },
-];
-
-const SLIDE_COUNT = 4;
+const SLIDE_COUNT = 3;
 
 function getSlideCopy(slideIndex) {
   if (slideIndex === 1) {
     return { headline: CANDIDATES_SLIDE_HEADLINE, lines: CANDIDATES_SLIDE_LINES };
   }
-  if (slideIndex === 3) {
-    return { headline: COALITION_SLIDE_HEADLINE, lines: COALITION_SLIDE_LINES };
+  if (slideIndex === 2) {
+    return { headline: POLITICAL_MAP_HEADLINE, lines: POLITICAL_SLIDE_LINES };
   }
   return { headline: DEFAULT_SLIDE_HEADLINE, lines: DEFAULT_SLIDE_LINES };
 }
@@ -87,148 +79,76 @@ function FirstSlideIdentityLine({ compact }) {
 }
 
 const HEADLINE_BLUE = "text-[#0f4c9a] drop-shadow-[0_1px_0_rgba(255,255,255,0.85)]";
+const IG_GRADIENT_BADGE = "bg-gradient-to-br from-[#FCAF45] via-[#F77737] to-[#FD1D1D]";
 const FLOWING_FONT = "font-flowing";
+const TOPICS_FONT = "font-topics";
+const TOPICS_LIST_FONT = "font-topics-list";
 
 function getTopicsHeadlineClass(compact) {
-  const layout = `mx-auto max-w-[20rem] text-center font-normal leading-[1.22] tracking-normal sm:max-w-[22rem] ${FLOWING_FONT}`;
-  const size = compact ? "text-[1.625rem] sm:text-[1.875rem]" : "text-[1.875rem] sm:text-[2.125rem]";
+  const layout = `mx-auto max-w-[20rem] text-center font-semibold leading-[1.16] tracking-[-0.02em] sm:max-w-[22rem] ${TOPICS_FONT}`;
+  const size = compact ? "text-[1.8125rem] sm:text-[1.875rem]" : "text-[1.875rem] sm:text-[2.125rem]";
 
-  return `${layout} ${size} ${HEADLINE_BLUE} -mt-1`;
+  return `${layout} ${size} ${HEADLINE_BLUE} -mt-14 sm:-mt-12`;
 }
 
-function TopicsHeadline({ compact }) {
+function TopicsStyleHeadline({ compact, line1, line2, nudgeDown = false }) {
+  const nudge = nudgeDown ? " translate-y-4 sm:translate-y-3" : "";
+
   return (
-    <h2 className={getTopicsHeadlineClass(compact)}>
-      <span className="block">{TOPICS_SLIDE_HEADLINE_PARTS.line1}</span>
-      <span className="block">{TOPICS_SLIDE_HEADLINE_PARTS.line2}</span>
+    <h2 className={`${getTopicsHeadlineClass(compact)}${nudge}`}>
+      <span className="block">{line1}</span>
+      <span className={`block ${line2 ? "" : "invisible"}`} aria-hidden={!line2}>
+        {line2 ?? "\u00A0"}
+      </span>
     </h2>
   );
 }
 
-function getListLineClass(compact, enlarged = false, topicsSlide = false) {
-  const size = enlarged
-    ? compact
-      ? "text-[1.1875rem] sm:text-[1.3125rem]"
-      : "text-[1.3125rem] sm:text-[1.4375rem]"
-    : topicsSlide
-      ? compact
-        ? "text-[1.25rem] sm:text-[1.375rem]"
-        : "text-[1.375rem] sm:text-[1.5rem]"
-      : compact
-        ? "text-[0.8125rem] sm:text-[0.9375rem]"
-        : "text-sm sm:text-base";
-
-  const weight = "font-normal";
-  const tracking = "tracking-normal";
-  const leading = "leading-snug";
-
-  return `min-w-0 flex-1 text-right ${leading} ${tracking} whitespace-nowrap ${size} ${weight} text-slate-900 ${FLOWING_FONT}`;
-}
-
-function getContentSlideHeadlineClass(compact) {
-  const layout = `text-balance text-center font-normal leading-[1.22] tracking-normal ${FLOWING_FONT}`;
-  const size = compact ? "text-[1.4375rem] sm:text-[1.625rem]" : "text-[1.625rem] sm:text-[1.9375rem]";
-  const maxW = compact ? "max-w-[20rem]" : "max-w-[22rem]";
-
-  return `${maxW} ${layout} ${size} ${HEADLINE_BLUE}`;
-}
-
-function getSlideNumClass(compact, enlarged = false, topicsSlide = false) {
-  const gradient =
-    "bg-gradient-to-b from-blue-700 via-blue-600 to-slate-400 bg-clip-text text-transparent sm:from-blue-800 sm:via-blue-600 sm:to-sky-400";
-
-  if (topicsSlide) {
-    return compact
-      ? `shrink-0 ${gradient} ${FLOWING_FONT} text-[2.875rem] font-normal tabular-nums leading-none sm:text-[3.125rem]`
-      : `shrink-0 ${gradient} ${FLOWING_FONT} text-[3.125rem] font-normal tabular-nums leading-none sm:text-[3.5rem]`;
-  }
-
-  return enlarged
-    ? compact
-      ? `shrink-0 ${gradient} ${FLOWING_FONT} text-[2.625rem] font-normal tabular-nums leading-none sm:text-[3.125rem]`
-      : `shrink-0 ${gradient} ${FLOWING_FONT} text-[3.125rem] font-normal tabular-nums leading-none sm:text-[3.625rem]`
-    : compact
-      ? `shrink-0 ${gradient} text-[1.9rem] font-black tabular-nums leading-none sm:text-[2.3rem]`
-      : `shrink-0 ${gradient} text-[2.3rem] font-black tabular-nums leading-none sm:text-[2.75rem]`;
-}
-
-const POLITICAL_MAP_STYLE = {
-  axis: "bg-gradient-to-r from-slate-200 via-slate-400 to-slate-200",
-  tick: "bg-slate-300",
-  dot: "border-blue-600 bg-blue-500 shadow-[0_0_10px_rgba(37,99,235,0.35)]",
-  label: "text-slate-900",
-};
-
-function AxisEndLabel({ label }) {
-  const labelClass = `text-[0.8125rem] font-normal leading-none sm:text-[0.9375rem] ${POLITICAL_MAP_STYLE.label} ${FLOWING_FONT}`;
-
-  if (Array.isArray(label)) {
-    return (
-      <span className="flex flex-col items-center gap-0.5 text-center">
-        {label.map((line) => (
-          <span key={line} className={`${labelClass} whitespace-nowrap`}>
-            {line}
-          </span>
-        ))}
-      </span>
-    );
-  }
-
-  return <span className={`${labelClass} whitespace-nowrap text-center`}>{label}</span>;
-}
-
-function PoliticalAxisRow({ leftLabel, rightLabel, dotLeft, compact }) {
-  const isMultiline = Array.isArray(leftLabel) || Array.isArray(rightLabel);
-  const rowHeight = isMultiline
-    ? compact
-      ? "h-[4.25rem]"
-      : "h-[4.5rem]"
-    : compact
-      ? "h-[3.25rem]"
-      : "h-14";
-
+function TopicsHeadline({ compact }) {
   return (
-    <li className="w-full">
-      <div className={`relative w-full ${rowHeight}`} dir="ltr">
-        <div className="absolute inset-x-7 top-1/2 -translate-y-1/2 sm:inset-x-9">
-          <div className="absolute bottom-[calc(100%+0.625rem)] left-0 -translate-x-1/2">
-            <AxisEndLabel label={leftLabel} />
-          </div>
-          <div className="absolute bottom-[calc(100%+0.625rem)] right-0 translate-x-1/2">
-            <AxisEndLabel label={rightLabel} />
-          </div>
-
-          <span className={`absolute left-0 top-0 h-2.5 w-0.5 -translate-x-1/2 -translate-y-1/2 rounded-full ${POLITICAL_MAP_STYLE.tick}`} aria-hidden />
-          <span className={`absolute right-0 top-0 h-2.5 w-0.5 translate-x-1/2 -translate-y-1/2 rounded-full ${POLITICAL_MAP_STYLE.tick}`} aria-hidden />
-          <span className={`absolute left-0 right-0 top-0 h-[2.5px] -translate-y-1/2 rounded-full ${POLITICAL_MAP_STYLE.axis}`} aria-hidden />
-          <span
-            className={`absolute top-0 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 sm:h-4 sm:w-4 ${POLITICAL_MAP_STYLE.dot}`}
-            style={{ left: dotLeft }}
-            aria-hidden
-          />
-        </div>
-      </div>
-    </li>
+    <TopicsStyleHeadline
+      compact={compact}
+      line1={TOPICS_SLIDE_HEADLINE_PARTS.line1}
+      line2={TOPICS_SLIDE_HEADLINE_PARTS.line2}
+    />
   );
 }
 
-function PoliticalMapSlidePanel({ compact }) {
+function TopicsListRow({ compact, index, line }) {
+  const badgeSize = compact
+    ? "h-8 w-8 rounded-xl text-sm sm:h-7 sm:w-7 sm:rounded-lg sm:text-xs"
+    : "h-7 w-7 rounded-lg text-xs sm:text-[0.8125rem]";
+
   return (
-    <div className="pointer-events-none flex w-full flex-col items-center justify-center gap-2.5 px-1 sm:gap-4 sm:px-2">
-      <h2 className={getContentSlideHeadlineClass(compact)}>{POLITICAL_MAP_HEADLINE}</h2>
-      <ul className={`mt-6 w-full space-y-3.5 sm:mt-8 sm:space-y-5 ${compact ? "max-w-[22.5rem]" : "max-w-[25rem]"}`}>
-        {POLITICAL_MAP_AXES.map((axis) => (
-          <PoliticalAxisRow
-            key={axis.id}
-            leftLabel={axis.leftLabel}
-            rightLabel={axis.rightLabel}
-            dotLeft={axis.dotLeft}
-            compact={compact}
-          />
-        ))}
-      </ul>
+    <div
+      className={`flex w-full min-w-0 items-center gap-3.5 px-0 py-2 sm:gap-4 sm:py-2.5 ${TOPICS_LIST_FONT}`}
+    >
+      <span
+        className={`flex shrink-0 items-center justify-center font-normal tabular-nums leading-none text-white shadow-[0_4px_14px_rgba(247,119,55,0.28)] ${IG_GRADIENT_BADGE} ${badgeSize}`}
+      >
+        {index}
+      </span>
+      <p className={getListLineClass(compact)}>{line}</p>
     </div>
   );
+}
+
+function getListLineClass(compact, topicsSlide = true) {
+  const size = topicsSlide
+    ? compact
+      ? "text-[1.4375rem] sm:text-[1.3125rem]"
+      : "text-[1.3125rem] sm:text-[1.4375rem]"
+    : compact
+      ? "text-[0.8125rem] sm:text-[0.9375rem]"
+      : "text-sm sm:text-base";
+
+  const weight = "font-normal";
+  const tracking = topicsSlide ? "tracking-[-0.01em]" : "tracking-normal";
+  const leading = "leading-snug";
+  const font = topicsSlide ? TOPICS_LIST_FONT : FLOWING_FONT;
+  const color = topicsSlide ? "text-slate-800/90" : "text-slate-900";
+
+  return `min-w-0 flex-1 text-right ${leading} ${tracking} whitespace-nowrap ${size} ${weight} ${color} ${font}`;
 }
 
 const rtlSlideVariants = {
@@ -248,22 +168,15 @@ function CreativeTopHeader({ children }) {
 }
 
 const AI_DISCLAIMER = "התאמה זו בוצעה באמצעות AI";
-const USER_DISCLAIMER = "אני משתמש מספר 8 שלוקח אחריות על הבחירות";
 const FOOTER_CTA = "גלו את שלכם";
 const FOOTER_SITE_LABEL = "PoliticalID.co.il";
 const FOOTER_SITE_URL = "https://PoliticalID.co.il";
 
 function CreativeBottomFooter() {
   return (
-    <>
-      <div className="relative z-30 mb-3 w-full shrink-0 -translate-y-[5.25rem] px-2 pb-0.5 pt-0.5 sm:mb-4 sm:-translate-y-[2.5rem]">
-        <div className="pointer-events-none space-y-0.5 text-center text-sm font-semibold leading-snug text-slate-600/85 sm:space-y-1 sm:text-base">
-          <p>{AI_DISCLAIMER}</p>
-          <p>{USER_DISCLAIMER}</p>
-        </div>
-      </div>
-
-      <div className="absolute inset-x-0 bottom-10 z-30 space-y-0.5 px-2 text-center text-sm font-semibold leading-snug text-slate-600/85 sm:bottom-6 sm:space-y-1 sm:text-base">
+    <div className="absolute inset-x-0 bottom-10 z-30 px-2 text-center text-sm font-semibold leading-snug text-slate-600/85 sm:bottom-6 sm:text-base">
+      <div className="flex flex-col items-center gap-1">
+        <p className="pointer-events-none">{AI_DISCLAIMER}</p>
         <p className="pointer-events-none">{FOOTER_CTA}</p>
         <a
           href={FOOTER_SITE_URL}
@@ -274,7 +187,7 @@ function CreativeBottomFooter() {
           {FOOTER_SITE_LABEL}
         </a>
       </div>
-    </>
+    </div>
   );
 }
 
@@ -374,67 +287,26 @@ function StoryProgressBar({ compact, index, total }) {
   );
 }
 
-/** כוכב בסגנון Gemini — צורה רשמית, צבע לבן דרך currentColor */
-const GEMINI_SPARKLE_PATH =
-  "M32.447 0c.68 0 1.273.465 1.439 1.125a38.904 38.904 0 001.999 5.905c2.152 5 5.105 9.376 8.854 13.125 3.751 3.75 8.126 6.703 13.125 8.855a38.98 38.98 0 005.906 1.999c.66.166 1.124.758 1.124 1.438 0 .68-.464 1.273-1.125 1.439a38.902 38.902 0 00-5.905 1.999c-5 2.152-9.375 5.105-13.125 8.854-3.749 3.751-6.702 8.126-8.854 13.125a38.973 38.973 0 00-2 5.906 1.485 1.485 0 01-1.438 1.124c-.68 0-1.272-.464-1.438-1.125a38.913 38.913 0 00-2-5.905c-2.151-5-5.103-9.375-8.854-13.125-3.75-3.749-8.125-6.702-13.125-8.854a38.973 38.973 0 00-5.905-2A1.485 1.485 0 010 32.448c0-.68.465-1.272 1.125-1.438a38.903 38.903 0 005.905-2c5-2.151 9.376-5.104 13.125-8.854 3.75-3.749 6.703-8.125 8.855-13.125a38.972 38.972 0 001.999-5.905A1.485 1.485 0 0132.447 0z";
+const TOPICS_SLIDE_WEB_OFFSET = "-translate-y-14 sm:-translate-y-11";
+const TOPICS_LAYOUT_LIST_CLASS =
+  "mt-6 w-full max-w-[min(100%,24rem)] -translate-x-12 translate-y-4 space-y-2.5 sm:mt-5 sm:max-w-[26rem] sm:-translate-x-14 sm:translate-y-1 sm:space-y-3";
+const CONTENT_PANEL_CLASS = `flex w-full flex-col items-center justify-center gap-1.5 px-1 sm:gap-3 sm:px-2 ${TOPICS_SLIDE_WEB_OFFSET}`;
 
-function DuoSparkle({ className }) {
-  return (
-    <svg className={`pointer-events-none text-white/90 ${className}`} viewBox="0 0 65 65" fill="currentColor" aria-hidden>
-      <path d={GEMINI_SPARKLE_PATH} />
-    </svg>
-  );
-}
-
-function getSlidePanelStyles(compact) {
-  return {
-    pillClass: compact
-      ? "flex w-full min-w-0 items-center gap-3 px-1 py-1 sm:gap-4 sm:px-1.5 sm:py-1.5"
-      : "flex w-full min-w-0 items-center gap-3.5 px-1.5 py-1.5 sm:gap-4 sm:px-2 sm:py-2",
-  };
-}
-
-const SLIDE_PANEL_OFFSET = "-translate-y-10 sm:-translate-y-6";
-const TOPICS_SLIDE_WEB_OFFSET = "-translate-y-10 sm:-translate-y-3";
-
-function MapSlidePanel({ compact, pillClass, slideIndex }) {
-  if (slideIndex === 2) {
-    return (
-      <div className={`flex w-full flex-col items-center ${SLIDE_PANEL_OFFSET}`}>
-        <PoliticalMapSlidePanel compact={compact} />
-      </div>
-    );
-  }
-
+function MapSlidePanel({ compact, slideIndex }) {
   const { headline, lines } = getSlideCopy(slideIndex);
-  const isTopicsSlide = slideIndex === 0;
-  const numClass = getSlideNumClass(compact, !isTopicsSlide, isTopicsSlide);
-
-  const panelOffset = isTopicsSlide ? TOPICS_SLIDE_WEB_OFFSET : SLIDE_PANEL_OFFSET;
 
   return (
-    <div
-      className={`flex w-full flex-col items-center justify-center gap-1.5 px-1 sm:gap-3 sm:px-2 ${panelOffset}`}
-    >
-      {isTopicsSlide ? (
+    <div className={CONTENT_PANEL_CLASS}>
+      {slideIndex === 0 ? (
         <TopicsHeadline compact={compact} />
       ) : (
-        <h2 className={getContentSlideHeadlineClass(compact)}>{headline}</h2>
+        <TopicsStyleHeadline compact={compact} line1={headline} nudgeDown />
       )}
 
-      <ul
-        className={
-          isTopicsSlide
-            ? "mt-4 w-full max-w-[min(100%,24rem)] space-y-3 sm:mt-6 sm:max-w-[26rem] sm:space-y-4"
-            : "mt-3 w-full max-w-[20rem] space-y-2 sm:mt-4 sm:max-w-[22rem] sm:space-y-3"
-        }
-      >
+      <ul className={TOPICS_LAYOUT_LIST_CLASS}>
         {lines.map((line, idx) => (
           <li key={line} className="flex justify-center">
-            <div className={pillClass}>
-              <span className={numClass}>{idx + 1}</span>
-              <p className={getListLineClass(compact, !isTopicsSlide, isTopicsSlide)}>{line}</p>
-            </div>
+            <TopicsListRow compact={compact} index={idx + 1} line={line} />
           </li>
         ))}
       </ul>
@@ -444,7 +316,6 @@ function MapSlidePanel({ compact, pillClass, slideIndex }) {
 
 function MapCreative({ compact }) {
   const { index, direction, onTouchStart, onTouchEnd, onPagerClick } = useSlidePager(SLIDE_COUNT);
-  const { pillClass } = getSlidePanelStyles(compact);
 
   return (
     <div
@@ -479,11 +350,6 @@ function MapCreative({ compact }) {
         </AnimatePresence>
       </div>
 
-      <DuoSparkle className="absolute left-[10%] top-[20%] z-[5] h-3.5 w-3.5 opacity-95 sm:h-4 sm:w-4" />
-      <DuoSparkle className="absolute right-[14%] top-[26%] z-[5] h-3 w-3 opacity-80 sm:right-[12%] sm:h-3.5 sm:w-3.5" />
-      <DuoSparkle className="absolute left-[28%] bottom-[30%] z-[5] h-3 w-3 opacity-70 sm:bottom-[28%] sm:h-3.5 sm:w-3.5" />
-      <DuoSparkle className="absolute right-[30%] bottom-[22%] z-[5] h-3.5 w-3.5 opacity-85 sm:h-4 sm:w-4" />
-
       <CreativeTopHeader>
         <StoryProgressBar compact={compact} index={index} total={SLIDE_COUNT} />
       </CreativeTopHeader>
@@ -503,7 +369,7 @@ function MapCreative({ compact }) {
             transition={rtlSlideTransition}
             className="pointer-events-none flex w-full flex-col items-center justify-center"
           >
-            <MapSlidePanel compact={compact} pillClass={pillClass} slideIndex={index} />
+            <MapSlidePanel compact={compact} slideIndex={index} />
           </motion.div>
         </AnimatePresence>
       </div>

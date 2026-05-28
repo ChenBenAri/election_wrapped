@@ -2,6 +2,8 @@
 
 @theme {
   --font-flowing: "Nunito", "Heebo", system-ui, sans-serif;
+  --font-topics: "Rubik", "Heebo", system-ui, sans-serif;
+  --font-topics-list: "Secular One", "Rubik", system-ui, sans-serif;
 }
 
 html,
