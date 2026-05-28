@@ -289,7 +289,7 @@ function StoryProgressBar({ compact, index, total }) {
 
 const TOPICS_SLIDE_WEB_OFFSET = "-translate-y-14 sm:-translate-y-11";
 const TOPICS_LAYOUT_LIST_CLASS =
-  "mt-6 w-full max-w-[min(100%,24rem)] -translate-x-12 translate-y-4 space-y-2.5 sm:mt-5 sm:max-w-[26rem] sm:-translate-x-14 sm:translate-y-1 sm:space-y-3";
+  "mt-5 w-full max-w-[min(100%,24rem)] -translate-x-12 translate-y-2 space-y-2.5 sm:mt-4 sm:max-w-[26rem] sm:-translate-x-14 sm:translate-y-0 sm:space-y-3";
 const CONTENT_PANEL_CLASS = `flex w-full flex-col items-center justify-center gap-1.5 px-1 sm:gap-3 sm:px-2 ${TOPICS_SLIDE_WEB_OFFSET}`;
 
 function MapSlidePanel({ compact, slideIndex }) {
